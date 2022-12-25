@@ -16,7 +16,8 @@
     [ring.middleware.reload :refer [wrap-reload]]
     [ring.middleware.keyword-params :refer [wrap-keyword-params]]
     [ring.middleware.multipart-params :refer [wrap-multipart-params]]
-    [new-application.administrator :as a]))
+    [new-application.administrator :as a]
+    [new-application.db-statistic :as dbs]))
 
 ;;Resenje jer baca gresku kad cita polja
 (defn full-name [full_name]
@@ -41,6 +42,18 @@
   (let [map {:login    (clojure.string/replace (get (clojure.string/split string #"&") 0) "login=" "")
              :password (clojure.string/replace (get (clojure.string/split string #"&") 1) "password=" "")}] map))
 
+
+(defn food-do-date-month-type-amount-id [string]
+  ;string contains name and phone in this format
+  ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
+  (let [map {:do_date   (clojure.string/replace (get (clojure.string/split string #"&") 0) "do_date=" "")
+             :month_name (clojure.string/replace (get (clojure.string/split string #"&") 1) "month_name=" "")
+             :type_name    (street (clojure.string/replace (get (clojure.string/split string #"&") 2) "type_name=" ""))
+             :amount    (clojure.string/replace (get (clojure.string/split string #"&") 3) "amount=" "")
+             :id        (clojure.string/replace (get (clojure.string/split string #"&") 4) "id=" "")}] map))
+
+
+
 ;;RUTE
 
 (defn base-page [& body]
@@ -56,32 +69,18 @@
            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
             [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
             [:div.navbar-nav.ml-auto
-             [:a.nav-item.nav.link {:href "/admin/login"} "Prijava"]
-             [:a.nav-item.nav.link {:href "/page-orders"} "Porudzbine"]
+             [:a.nav-item.nav.link {:href "/admin/login"} "     Prijava           "]
+             [:a.nav-item.nav.link  ""]
+             ;[:a.nav-item.nav.link {:href "/page-orders"} "Porudzbine"]
              ; [:a.nav-item.nav.link {:href "/orders/new/"} "   Nova porudzbina   "]
              ;[:a.nav-item.nav.link {:href "/all-orders/update"} "   Izmeni porudzbinu   "]
              ; [:a.nav-item.nav.link {:href "/all-orders/delete"} "   Izbrisi porudzbinu    "]
-             [:a.nav-item.nav.link {:href "/admin/login"} "Odjava"]
-             ]] [:hr] body]]))
+             [:a.nav-item.nav.link {:href "/admin/logout"} "        Odjava        "]]] [:hr]
+           [:a {:href "/page-orders"} [:h3 "Porucivanje jaja"]]
+           [:a {:href "/food-orders"} [:h3 "Porucivanje hrane"]]
+           body]]))
 
-(defn base-orders-page [& body]
-  (html5 [:head [:title "KOKODA - GRUJIC"]]
-         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
-                 :crossorigin "anonymous"}]
-         [:body
-          [:div.container
-           [:a {:href "/"} [:h2 "Dnevnik klijenata i prodaje jaja"]]
-           [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
-            [:div.navbar-nav.ml-auto
-             [:a.nav-item.nav.link {:href "/all-orders"} "Porudzbine"]]
-            [:div.navbar-nav.ml-auto
-             [:a.nav-item.nav.link {:href "/orders/new/"} "Kreiraj novu" "\t"]]
-            [:div.navbar-nav.ml-auto
-             [:a.nav-item.nav.link {:href "/all-orders/update"} "Izmeni"]]
-            [:div.navbar-nav.ml-auto
-             [:a.nav-item.nav.link {:href "/all-orders/delete"} "Obrisi"]]
-            ] [:hr] body]]))
+
 
 (base-page)
 
@@ -109,7 +108,7 @@
 
 
            (GET "/" [] (base-page))
-           (GET "/page-orders" [] (base-orders-page))
+
 
            (GET "/grujicagro-info" [] (html5 [:p "Napisati neki malo uvod i istoriju firme, ovde bi trebalo dodati malo neke slike"]))
            ;(GET "/all-orders" [] (p/orders-view (db/list-orders)))
@@ -168,7 +167,9 @@
 
 
 (defroutes administrator-routes
-           (GET "/all-orders" [] (p/index (db/list-orders)))
+
+           (GET "/page-orders" [] (p/base-orders-page))
+           (GET "/all-orders" [] (p/index (db/list-delivered-orders)))
            (GET "/orders/:order-id" [order-id] (p/view-order (db/get-order-by-id (read-string order-id))))
 
 
@@ -194,6 +195,21 @@
            (POST "/orders/delete/:id" req (do (let [order (full_name-amount-date-city_part-street-delivered-id (slurp (:body req)))]
                                                 (db/delete-order order))
                                               (resp/redirect "/")))
+           (GET "/undelivered-orders" [] (p/index-for-undelivered-orders))
+           (GET "/undelivered-order/:cp" [cp] (p/orders-view (dbs/undelivered-cp cp)))
+
+           (GET "/orders-statistic" [] (p/base-statistic-page))
+
+           ;;ROUTES FOR FOOD ORDERS
+           (GET "/food-orders" [] (p/base-food-page))
+           (GET "/food-order/new/" [] (p/form-new-food))
+           (POST "/food-order/new/:id" req (do (let [food (food-do-date-month-type-amount-id (slurp (:body req)))]
+                                             (db/new-food-order food))
+                                           (resp/redirect "/food-orders")))
+           (GET "/all-food-orders" [] (p/index-for-monthly-orders))
+           (GET "/month-order/:mo" [mo] (p/food-orders-view (db/list-full-forders mo)))
+
+           (GET "/all-food-orders/delete" [] (p/index-for-food-delete (db/list-full-forders-delete)))
            )
 
 ;handler je funkcija koja prima zahtev i vraca odgovor

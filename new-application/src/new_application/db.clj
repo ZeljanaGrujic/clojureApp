@@ -10,6 +10,9 @@
              :password ""
              })
 
+
+;;;RAD SA NARUDZBINAMA JAJA
+
 (def orderers-coll "orderers")
 
 (sql/query sql-db ["SELECT * FROM orderers"])
@@ -39,6 +42,9 @@
 (for [o (list-orders)]
   (println (:full_name o)))
 
+(defn list-delivered-orders [] (sql/query sql-db ["SELECT * FROM orderers WHERE delivered='DA'"]))
+(list-delivered-orders)
+
 (defn get-order-by-id [id]
   (nth (filter #(= (:id %) id) (sql/query sql-db ["SELECT * FROM orderers"])) 0))
 (get-order-by-id 9)
@@ -54,6 +60,34 @@
 (defn delete-order [order]
   (sql/execute! sql-db ["DELETE FROM orderers WHERE id = ?"(:id order)]))
 ;(delete-order {:id 3, :full_name "NECA", :amount "200", :do_date "23.12.2022", :location "HIM" :delivered "NE"})
+
+
+;;;;;;;RAD SA NARUCIVANJEM HRANE
+
+(defn get-id-by-type-name [type_name]
+  (:id (nth (sql/query sql-db ["SELECT id FROM food_types WHERE type_name=?"  type_name]) 0)))
+(get-id-by-type-name "Pantelic zito")
+(get-id-by-type-name "Pantelic vitamini")
+
+
+(defn new-food-order [{id :id amount :amount do_date :do_date month_name :month_name type_name :type_name}]
+  (sql/execute! sql-db ["INSERT INTO food_orders (do_date, month_name, type_id) VALUES (?, ?, ?) " do_date month_name (get-id-by-type-name type_name)]))
+
+(new-food-order {:do_date "28.12.2022" :month_name "December" :type_name "Pantelic zito"})
+
+(defn get-next-food-id []
+  (+ 1 (:m (nth (sql/query sql-db ["SELECT MAX(id) as m FROM food_orders"]) 0))))
+(get-next-food-id)
+
+(defn list-full-forders [month_name]
+  (sql/query sql-db ["SELECT food_orders.id, food_orders.amount, food_orders.do_date, food_orders.month_name, food_types.type_name FROM food_orders JOIN food_types ON food_orders.type_id =food_types.id WHERE month_name= ?"month_name]))
+
+(defn list-full-forders-delete []
+  (sql/query sql-db ["SELECT food_orders.id, food_orders.amount, food_orders.do_date, food_orders.month_name, food_types.type_name FROM food_orders JOIN food_types ON food_orders.type_id =food_types.id"]))
+
+(list-full-forders "Januar")
+(list-full-forders-delete)
+
 
 
 
