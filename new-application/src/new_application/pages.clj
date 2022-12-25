@@ -9,11 +9,19 @@
 (defn base [& body]
   (html5
     [:head [:title "GRUJIC- agro"]]
+    [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+            :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+            :crossorigin "anonymous"}]
     [:body
-     [:h1 "Dnevnik klijenata i prodaje jaja"]
-     [:a {:href "/"} "Pocetna stranica"]
-     [:hr]
-     body]))
+     [:div.container
+      [:h1 "KOKODA - GRUJIC"]
+      [:h2 "Dnevnik klijenata i prodaje jaja"]
+      [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
+       [:a.navbar-brand {:href "/"} "Pocetna stranica"]
+       ;mozda dodati i da mi se izlista za dostavu hrane, kad i koliko, i za mesec
+       ;ali pamtiti foru za svakog meseca tonu i fiksirati cenu tone i onda samo za taj isti mesec po nekoliko puta dodavati narudzbine pa onda prebrojati sve to
+       [:div.navbar-nav.ml-auto
+        [:a.nav-item.nav.link {:href "/admin/logout"} "Odjava"]][:hr]] body]]))
 
 (defn administrator-login []
   (html5
@@ -41,33 +49,34 @@
 
 (defn index [orders]
   (base [:h1 "All Orders"]
-         (for [o orders]
-           [:h4 [:a {:href (str "/orders/" (:id o))}"ID porudzbine " (:id o) "      Porucilac:" (:full_name o) "            Datum isporuke:" (:do_date o)]])))
+        (for [o orders]
+          [:h4 [:a {:href (str "/orders/" (:id o))} "ID porudzbine: " (:id o) "         Porucilac: " (:full_name o) "               Datum isporuke: " (:do_date o)]])))
 
 (defn index-for-update [orders]
   (base [:h1 "Choose order to update"]
         (for [o orders]
-          [:h4 [:a {:href (str "/orders/new/edit/" (:id o))}"ID porudzbine " (:id o) "      Porucilac:" (:full_name o) "            Datum isporuke:" (:do_date o)]])))
+          [:h4 [:a {:href (str "/orders/new/edit/" (:id o))} "ID porudzbine: " (:id o) "         Porucilac:  " (:full_name o) "                Datum isporuke: " (:do_date o)]])))
 
 (defn index-for-delete [orders]
   (base [:h1 "Choose order to delete"]
         (for [o orders]
-          [:h4 [:a {:href (str "/orders/new/delete/" (:id o))}"ID porudzbine " (:id o) "      Porucilac:" (:full_name o) "            Datum isporuke:" (:do_date o)]])))
+          [:h4 [:a {:href (str "/orders/new/delete/" (:id o))} "ID porudzbine: " (:id o) "         Porucilac:  " (:full_name o) "              Datum isporuke: " (:do_date o)]])))
 
 (defn view-order [order]
   (base
     [:a {:href (str "/orders/new/edit/" (:id order))} "Edit order directly"]
     [:hr]
-    [:small (:id order)]
-    [:h1 (:full_name order) "     " (:amount order) "     " (:do_date order)]
-    [:h2 (:city_part order) "     " (:street order) "     " (:delivered order)]))
+    [:small (:id order) " Redni br. narudzbine"]
+    [:h2 "Narucilac: " (:full_name order) "           Porucena kolicina: " (:amount order)]
+    [:h2 "Deo grada:  " (:city_part order) "            Ulica i broj: " (:street order)]
+    [:h2 "Datum isporuke: " (:do_date order) "            Izvrsena isporuka:  " (:delivered order)]))
 
-(view-order {:id 1,
+(view-order {:id        1,
              :full_name "Srecko Grujic",
-             :amount "0",
-             :do_date "00.00.0000",
+             :amount    "0",
+             :do_date   "00.00.0000",
              :city_part "Naselje",
-             :street "Dr. Cambe 10",
+             :street    "Dr. Cambe 10",
              :delivered "DA"})
 
 (index (db/list-orders))
@@ -103,15 +112,20 @@
 
                    (form/label "full_name" "Full name: ")
                    (form/text-field "full_name" "ime")
+                   [:hr]
                    (form/label "amount" "Amount: ")
                    (form/text-field "amount" "amount")
+                   [:hr]
                    (form/label "do_date" "Do date: ")
                    (form/text-field "do_date" "do date")
+                   [:hr]
                    (form/label "city_part" "City part: ")
                    ;(form/text-field "location" "Location")
                    [:div.div-separator (form/drop-down {:class "form-class"} "city_part" ["Kolonija" "Centar" "HRS" "HIM", "VUK", "Naselje", "Mikulja", "Bolnica", "Gimnazija", "Opeka", "Jezero"])]
+                   [:hr]
                    (form/label "street" "Street: ")
                    (form/text-field "street" "street")
+                   [:hr]
                    (form/label "delivered" "Delivered (DA/NE): ")
                    ;(form/text-field "delivered" "delivered")
                    [:div.div-separator (form/drop-down {:class "form-class"} "delivered" ["DA" "NE"])]
@@ -137,15 +151,20 @@
 
                    (form/label "full_name" "Full name: ")
                    (form/text-field "full_name" (:full_name order))
+                   [:hr]
                    (form/label "amount" "Amount: ")
                    (form/text-field "amount" (:amount order))
+                   [:hr]
                    (form/label "do_date" "Do date: ")
                    (form/text-field "do_date" (:do_date order))
+                   [:hr]
                    (form/label "city_part" "City part: ")
                    ;(form/text-field "location" (:location order))
                    (form/drop-down {:class "form-class"} "city_part" ["Kolonija" "Centar" "HRS" "HIM", "VUK", "Naselje", "Mikulja", "Bolnica", "Gimnazija", "Opeka", "Jezero"])
+                   [:hr]
                    (form/label "street" "Street: ")
                    (form/text-field "street" (:street order))
+                   [:hr]
                    (form/label "delivered" "Delivered (DA/NE): ")
                    ;(form/text-field "deliverede" (:delivered order))
                    (form/drop-down {:class "form-class"} "delivered" ["DA" "NE"])
@@ -164,14 +183,19 @@
 
                    (form/label "full_name" "Full name: ")
                    (form/text-field "full_name" (:full_name order))
+                   [:hr]
                    (form/label "amount" "Amount: ")
                    (form/text-field "amount" (:amount order))
+                   [:hr]
                    (form/label "do_date" "Do date: ")
                    (form/text-field "do_date" (:do_date order))
+                   [:hr]
                    (form/label "city_part" "City part: ")
                    (form/text-field "city_part" (:city_part order))
+                   [:hr]
                    (form/label "street" "Street: ")
                    (form/text-field "street" (:street order))
+                   [:hr]
                    (form/label "delivered" "Delivered (DA/NE): ")
                    (form/text-field "deliverede" (:delivered order))
                    (form/hidden-field "id" (:id order))

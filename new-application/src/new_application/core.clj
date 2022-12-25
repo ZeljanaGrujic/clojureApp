@@ -29,30 +29,60 @@
 (defn full_name-amount-date-city_part-street-delivered-id [string]
   ;string contains name and phone in this format
   ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
-  (let [map {:full_name  (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))
-             :amount (clojure.string/replace (get (clojure.string/split string #"&") 1) "amount=" "")
-             :do_date (clojure.string/replace (get (clojure.string/split string #"&") 2) "do_date=" "")
+  (let [map {:full_name (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))
+             :amount    (clojure.string/replace (get (clojure.string/split string #"&") 1) "amount=" "")
+             :do_date   (clojure.string/replace (get (clojure.string/split string #"&") 2) "do_date=" "")
              :city_part (clojure.string/replace (get (clojure.string/split string #"&") 3) "city_part=" "")
-             :street (street (clojure.string/replace (get (clojure.string/split string #"&") 4) "street=" ""))
+             :street    (street (clojure.string/replace (get (clojure.string/split string #"&") 4) "street=" ""))
              :delivered (clojure.string/replace (get (clojure.string/split string #"&") 5) "delivered=" "")
-             :id (clojure.string/replace (get (clojure.string/split string #"&") 6) "id=" "")}] map))
+             :id        (clojure.string/replace (get (clojure.string/split string #"&") 6) "id=" "")}] map))
 
 (defn administrator [string]
-  (let [map {:login  (clojure.string/replace (get (clojure.string/split string #"&") 0) "login=" "")
+  (let [map {:login    (clojure.string/replace (get (clojure.string/split string #"&") 0) "login=" "")
              :password (clojure.string/replace (get (clojure.string/split string #"&") 1) "password=" "")}] map))
 
 ;;RUTE
 
 (defn base-page [& body]
   ;basic template for all our pages
-  (html5 [:head [:title "GRUJIC- agro KOKODA"]]
-         [:body [:h1 "Dnevnik klijenata i prodaje jaja"]
-          [:a {:href "/grujicagro-info"} [:h2 "GRUJIC-agro"]]
-          [:a {:href "/all-orders"} [:h3 "Pogledajte sve porudzbine"]]
-          [:a {:href "/orders/new/"} [:h3 "Nova porudzbina"]]
-          [:a {:href "/all-orders/update"} [:h3 "Izmeni porudzbinu"]]
-          [:a {:href "/all-orders/delete"} [:h3 "Izbrisi porudzbinu"]]
-          body]))
+  (html5 [:head [:title "KOKODA - GRUJIC"]]
+         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+                 :crossorigin "anonymous"}]
+         [:body
+          [:div.container
+           [:h1 "KOKODA - GRUJIC"]
+           [:h2 "Dnevnik klijenata i prodaje jaja"]
+           [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
+            [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
+            [:div.navbar-nav.ml-auto
+             [:a.nav-item.nav.link {:href "/admin/login"} "Prijava"]
+             [:a.nav-item.nav.link {:href "/page-orders"} "Porudzbine"]
+             ; [:a.nav-item.nav.link {:href "/orders/new/"} "   Nova porudzbina   "]
+             ;[:a.nav-item.nav.link {:href "/all-orders/update"} "   Izmeni porudzbinu   "]
+             ; [:a.nav-item.nav.link {:href "/all-orders/delete"} "   Izbrisi porudzbinu    "]
+             [:a.nav-item.nav.link {:href "/admin/login"} "Odjava"]
+             ]] [:hr] body]]))
+
+(defn base-orders-page [& body]
+  (html5 [:head [:title "KOKODA - GRUJIC"]]
+         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+                 :crossorigin "anonymous"}]
+         [:body
+          [:div.container
+           [:a {:href "/"} [:h2 "Dnevnik klijenata i prodaje jaja"]]
+           [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
+            [:div.navbar-nav.ml-auto
+             [:a.nav-item.nav.link {:href "/all-orders"} "Porudzbine"]]
+            [:div.navbar-nav.ml-auto
+             [:a.nav-item.nav.link {:href "/orders/new/"} "Kreiraj novu" "\t"]]
+            [:div.navbar-nav.ml-auto
+             [:a.nav-item.nav.link {:href "/all-orders/update"} "Izmeni"]]
+            [:div.navbar-nav.ml-auto
+             [:a.nav-item.nav.link {:href "/all-orders/delete"} "Obrisi"]]
+            ] [:hr] body]]))
+
 (base-page)
 
 
@@ -68,8 +98,8 @@
              (let [administrator (administrator (slurp (:body req)))]
                (if (a/check-credentials administrator)
                  (-> (resp/redirect "/")
-                     (assoc-in [:session :admin] true));u http zahtev dodaje se polje :session{:admin true}
-                 (p/administrator-login ))))
+                     (assoc-in [:session :admin] true))     ;u http zahtev dodaje se polje :session{:admin true}
+                 (p/administrator-login))))
 
 
            (GET "/admin/logout" []
@@ -79,6 +109,8 @@
 
 
            (GET "/" [] (base-page))
+           (GET "/page-orders" [] (base-orders-page))
+
            (GET "/grujicagro-info" [] (html5 [:p "Napisati neki malo uvod i istoriju firme, ovde bi trebalo dodati malo neke slike"]))
            ;(GET "/all-orders" [] (p/orders-view (db/list-orders)))
            ;(GET "/all-orders" [] (p/index (db/list-orders)))
@@ -164,6 +196,24 @@
                                               (resp/redirect "/")))
            )
 
+;handler je funkcija koja prima zahtev i vraca odgovor
+;ako imamo admina u sesiji, koji se prijavio moze, nastavlja dalje rad
+;ako ne uloguje admin vraca se na login stranicu ponovo, tu treba da dodam poruku koja ce da mu ispise da nije dobro uneo kredencijale
+(defn wrap-admin-only [handler]
+  (fn [req]
+    (if (-> req :session :admin)
+      (handler req)
+      (resp/redirect "/admin/login"))))
+(def wrapping
+  (-> (routes (wrap-routes administrator-routes wrap-admin-only)
+              app-routes)
+      wrap-multipart-params
+      session/wrap-session))
+
+(def server
+  (ring/run-jetty wrapping {:port 3027 :join? false}))
+
+
 
 ;(defn full_name-amount-date-id [string]
 ;  ;string contains name and phone in this format
@@ -189,19 +239,6 @@
 ;  (-> app-routes (wrap-defaults  site-defaults)
 ;                session/wrap-session))
 
-(defn wrap-admin-only [handler]
-  (fn [req]
-    (if (-> req :session :admin)
-      (handler req)
-      (resp/redirect "/admin/login"))))
-(def wrapping
-  (-> (routes (wrap-routes administrator-routes wrap-admin-only)
-              app-routes)
-      wrap-multipart-params
-      session/wrap-session))
-
-(def server
-  (ring/run-jetty wrapping {:port 3027 :join? false}))
 
 ;;pokrecem aplikaciju sa lein run i na portu 3020 ce mi se pojaviti aplikacija
 
