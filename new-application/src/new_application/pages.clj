@@ -202,6 +202,29 @@
 
 
 
+(defn num-order-per-person [{full_name :full_name maked_orders :maked_orders}]
+  (html5
+    [:li (format " Full name: %s            Number of maked orders: %s" full_name maked_orders)]))
+
+(num-order-per-person {:full_name "NECA", :maked_orders 9})
+
+(defn persons-orders [porders]
+  (html5 [:ul
+          (map  num-order-per-person porders)]))
+
+
+
+(defn total-orders-per-month [{month_name :month_name monthly_orders :monthly_orders total_price :total_price total_amount :total_amount}]
+  (html5
+    [:li (format " Month: %s            Number of maked orders: %s        Total price: %s           Total amount: %s" month_name monthly_orders total_price total_amount)]))
+
+(defn all-statistic-for-months [opm]
+  (html5 [:ul
+          (map  total-orders-per-month opm)]))
+
+
+
+
 (defn base-statistic-page []
   (base
     [:h3 "Statistika narudzbina"]
@@ -214,10 +237,15 @@
 (base-statistic-page)
 
 
-
-
-
-
+(defn base-food-statistic-page []
+  (base
+    [:h3 "Statistika porucivanja hrane za koke:"]
+    [:h4 (format "Ukupan broj ostavrenih narudzbina: %s" (:total_num_orders (nth (dbs/general-food-statistic) 0)))]
+    [:h4 (format "Ukupan ostvareni trosak: %s" (:general_price (nth (dbs/general-food-statistic) 0)))]
+    [:h4 (format "Ukupna porucena kolicina: %s" (:general_amount (nth (dbs/general-food-statistic) 0)))]
+    [:hr]
+    [:h4 "Statistika narudzbina po mesecu:"]
+    (all-statistic-for-months (dbs/orders-per-month))))
 
 
 ;;;preko atoma
@@ -328,6 +356,28 @@
                    (form/label "delivered" "Delivered (DA/NE): ")
                    (form/text-field "deliverede" (:delivered order))
                    (form/hidden-field "id" (:id order))
+                   (anti-forgery-field)
+
+                   (form/submit-button "Delete order"))]))
+
+
+
+(defn form-delete-food-order [forder]
+  (html5
+    [:body
+     [:p (:id forder)]
+     (form/form-to [:post (if forder
+                            (str "/food-order/delete/" (:id forder))
+                            "/all-food-orders/delete")]
+
+                   (form/label "do_date" "Do date: ")
+                   (form/text-field "do_date" (:do_date forder))
+                   [:hr]
+                   (form/label "month_name" "Month: ")
+                   (form/text-field "month_name" (:month_name forder))
+                   [:hr]
+                   (form/hidden-field "type_id" (:type_id forder))
+                   (form/hidden-field "id" (:id forder))
                    (anti-forgery-field)
 
                    (form/submit-button "Delete order"))]))

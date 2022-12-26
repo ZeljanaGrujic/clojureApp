@@ -52,7 +52,13 @@
              :amount    (clojure.string/replace (get (clojure.string/split string #"&") 3) "amount=" "")
              :id        (clojure.string/replace (get (clojure.string/split string #"&") 4) "id=" "")}] map))
 
-
+(defn delete-food-do-date-month-type-id [string]
+  ;string contains name and phone in this format
+  ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
+  (let [map {:do_date   (clojure.string/replace (get (clojure.string/split string #"&") 0) "do_date=" "")
+             :month_name (clojure.string/replace (get (clojure.string/split string #"&") 1) "month_name=" "")
+             :type_id    (street (clojure.string/replace (get (clojure.string/split string #"&") 2) "type_id=" ""))
+             :id        (clojure.string/replace (get (clojure.string/split string #"&") 3) "id=" "")}] map))
 
 ;;RUTE
 
@@ -179,14 +185,14 @@
            (GET "/orders/new/" [] (p/form-new-order))
            (POST "/orders/new/:id" req (do (let [order (full_name-amount-date-city_part-street-delivered-id (slurp (:body req)))]
                                              (db/new-order order))
-                                           (resp/redirect "/")))
+                                           (resp/redirect "/page-orders")))
 
 
            (GET "/all-orders/update" [] (p/index-for-update (db/list-orders)))
            (GET "/orders/new/edit/:id" [id] (p/edit-order (db/get-order-by-id (read-string id))))
            (POST "/orders/:id" req (do (let [order (full_name-amount-date-city_part-street-delivered-id (slurp (:body req)))]
                                          (db/edit-order order))
-                                       (resp/redirect "/")))
+                                       (resp/redirect "/page-orders")))
 
 
 
@@ -194,7 +200,7 @@
            (GET "/orders/new/delete/:id" [id] (p/form-delete-order (db/get-order-by-id (read-string id))))
            (POST "/orders/delete/:id" req (do (let [order (full_name-amount-date-city_part-street-delivered-id (slurp (:body req)))]
                                                 (db/delete-order order))
-                                              (resp/redirect "/")))
+                                              (resp/redirect "/page-orders")))
            (GET "/undelivered-orders" [] (p/index-for-undelivered-orders))
            (GET "/undelivered-order/:cp" [cp] (p/orders-view (dbs/undelivered-cp cp)))
 
@@ -210,6 +216,11 @@
            (GET "/month-order/:mo" [mo] (p/food-orders-view (db/list-full-forders mo)))
 
            (GET "/all-food-orders/delete" [] (p/index-for-food-delete (db/list-full-forders-delete)))
+           (GET "/food-order/delete/:id" [id] (p/form-delete-food-order (db/get-food-order-by-id (read-string id))))
+           (POST "/food-order/delete/:id" req (do (let [forder (delete-food-do-date-month-type-id (slurp (:body req)))]
+                                                (db/delete-food-order forder))
+                                              (resp/redirect "/food-orders")))
+           (GET "/foods-statistic" [] (p/base-food-statistic-page))
            )
 
 ;handler je funkcija koja prima zahtev i vraca odgovor

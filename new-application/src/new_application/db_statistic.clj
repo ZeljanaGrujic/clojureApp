@@ -38,7 +38,19 @@
 
 
 ;;;;;RAD SA STATISTIKOM NARUCIVANJA HRANE
+(defn orders-per-month []
+  (sql/query sql-db ["SELECT food_orders.id, month_name,COUNT(*) AS monthly_orders, SUM(price) AS total_price, SUM(amount) AS total_amount
+                     FROM food_orders JOIN food_types ON food_orders.type_id =food_types.id
+                     GROUP BY month_name ORDER BY total_price DESC"]))
+(orders-per-month)
 
+(defn general-food-statistic []
+  (sql/query sql-db ["SELECT COUNT(*) AS total_num_orders, SUM(price) AS general_price, SUM(amount) AS general_amount
+  FROM food_orders JOIN food_types ON food_orders.type_id =food_types.id"]))
+
+(:total_num_orders (nth (general-food-statistic) 0))
+(:general_price (nth (general-food-statistic) 0))
+(:general_amount (nth (general-food-statistic) 0))
 
 
 

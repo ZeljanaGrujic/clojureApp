@@ -85,6 +85,15 @@
 (defn list-full-forders-delete []
   (sql/query sql-db ["SELECT food_orders.id, food_orders.amount, food_orders.do_date, food_orders.month_name, food_types.type_name FROM food_orders JOIN food_types ON food_orders.type_id =food_types.id"]))
 
+;get-food-order-by-id
+(defn get-food-order-by-id [id]
+  (nth (filter #(= (:id %) id) (sql/query sql-db ["SELECT * FROM food_orders"])) 0))
+(get-food-order-by-id 1)
+
+(defn delete-food-order [forder]
+  (sql/execute! sql-db ["DELETE FROM food_orders WHERE id = ?"(:id forder)]))
+
+
 (list-full-forders "Januar")
 (list-full-forders-delete)
 
