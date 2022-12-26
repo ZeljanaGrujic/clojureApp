@@ -3,8 +3,10 @@
     [hiccup.page :refer [html5]]
     [hiccup.form :as form]
     [ring.util.anti-forgery :refer (anti-forgery-field)]
-    [new-application.db :as db]
-    [new-application.db-statistic :as dbs]))
+    ;[new-application.db :as db]
+    ;[new-application.db-statistic :as dbs]
+    [new-application.orderers-db :as odb]
+    [new-application.food-orders-db :as fodb]))
 
 
 
@@ -29,7 +31,7 @@
             ;[:div.navbar-nav.ml-auto
             ; [:a.nav-item.nav.link {:href "/all-orders/delete"} "Obrisi"]]]
             ][:hr]
-           [:a {:href "/all-orders"} [:h3 "Isporucene porudzbine"]]
+           [:a {:href "/all-orders"} [:h3 "Sve porudzbine"]]
            [:a {:href "/undelivered-orders"} [:h3 "Neisporucene porudzbine"]]
            [:a {:href "/orders/new/"} [:h3 "Kreiraj novu porudzbinu"]]
            [:a {:href "/all-orders/update"} [:h3 "Izmeni porudzbinu"]]
@@ -113,6 +115,10 @@
         (for [o orders]
           [:h4 [:a {:href (str "/orders/" (:id o))} "ID porudzbine: " (:id o) "         Porucilac: " (:full_name o) "               Datum isporuke: " (:do_date o)]])))
 
+
+(index (odb/list-delivered-orders))
+
+
 (defn index-for-update [orders]
   (base [:h1 "Choose order to update"]
         (for [o orders]
@@ -162,8 +168,8 @@
              :street    "Dr. Cambe 10",
              :delivered "DA"})
 
-(index (db/list-orders))
-(view-order (db/get-order-by-id 1))
+(index (odb/list-orders))
+(view-order (odb/get-order-by-id 1))
 
 
 (defn order-view [{id :id full_name :full_name amount :amount do_date :do_date city_part :city_part street :street}]
@@ -175,7 +181,7 @@
           (map  order-view orders)]))
 
 
-(orders-view (dbs/undelivered-cp "Centar"))
+(orders-view (odb/undelivered-cp "Centar"))
 
 (defn num-order-per-person [{full_name :full_name maked_orders :maked_orders}]
   (html5
@@ -186,8 +192,8 @@
 (defn persons-orders [porders]
   (html5 [:ul
           (map  num-order-per-person porders)]))
-(dbs/orders-per-person)
-(persons-orders (dbs/orders-per-person))
+(odb/orders-per-person)
+(persons-orders (odb/orders-per-person))
 
 
 
@@ -202,15 +208,15 @@
 
 
 
-(defn num-order-per-person [{full_name :full_name maked_orders :maked_orders}]
-  (html5
-    [:li (format " Full name: %s            Number of maked orders: %s" full_name maked_orders)]))
+;(defn num-order-per-person [{full_name :full_name maked_orders :maked_orders}]
+;  (html5
+;    [:li (format " Full name: %s            Number of maked orders: %s" full_name maked_orders)]))
 
-(num-order-per-person {:full_name "NECA", :maked_orders 9})
-
-(defn persons-orders [porders]
-  (html5 [:ul
-          (map  num-order-per-person porders)]))
+;(num-order-per-person {:full_name "NECA", :maked_orders 9})
+;
+;(defn persons-orders [porders]
+;  (html5 [:ul
+;          (map  num-order-per-person porders)]))
 
 
 
@@ -228,24 +234,24 @@
 (defn base-statistic-page []
   (base
     [:h3 "Statistika narudzbina"]
-    [:h4 (format "Ukupan broj ostavrenih narudzbina: %s" (dbs/total-num-orders))]
-    [:h4 (format "Ukupan broj isporucenih narudzbina: %s" (dbs/total-num-delivered-orders))]
-    [:h4 (format "Ukupan broj neisporucenih narudzbina: %s" (dbs/total-num-undelivered-orders))]
+    [:h4 (format "Ukupan broj ostavrenih narudzbina: %s" (odb/total-num-orders))]
+    [:h4 (format "Ukupan broj isporucenih narudzbina: %s" (odb/total-num-delivered-orders))]
+    [:h4 (format "Ukupan broj neisporucenih narudzbina: %s" (odb/total-num-undelivered-orders))]
     [:hr]
     [:h4 "Broj narudzbina savkog korisnika:"]
-    (persons-orders (dbs/orders-per-person))))
+    (persons-orders (odb/orders-per-person))))
 (base-statistic-page)
 
 
 (defn base-food-statistic-page []
   (base
     [:h3 "Statistika porucivanja hrane za koke:"]
-    [:h4 (format "Ukupan broj ostavrenih narudzbina: %s" (:total_num_orders (nth (dbs/general-food-statistic) 0)))]
-    [:h4 (format "Ukupan ostvareni trosak: %s" (:general_price (nth (dbs/general-food-statistic) 0)))]
-    [:h4 (format "Ukupna porucena kolicina: %s" (:general_amount (nth (dbs/general-food-statistic) 0)))]
+    [:h4 (format "Ukupan broj ostavrenih narudzbina: %s" (:total_num_orders (nth (fodb/general-food-statistic) 0)))]
+    [:h4 (format "Ukupan ostvareni trosak: %s" (:general_price (nth (fodb/general-food-statistic) 0)))]
+    [:h4 (format "Ukupna porucena kolicina: %s" (:general_amount (nth (fodb/general-food-statistic) 0)))]
     [:hr]
     [:h4 "Statistika narudzbina po mesecu:"]
-    (all-statistic-for-months (dbs/orders-per-month))))
+    (all-statistic-for-months (fodb/orders-per-month))))
 
 
 ;;;preko atoma
@@ -265,7 +271,7 @@
 (defn form-new-order []
   (html5
     [:body
-     (form/form-to [:post (str "/orders/new/" (db/get-next-id))]
+     (form/form-to [:post (str "/orders/new/" (odb/get-next-id))]
 
                    (form/label "full_name" "Full name: ")
                    (form/text-field "full_name" "ime")
@@ -286,13 +292,13 @@
                    (form/label "delivered" "Delivered (DA/NE): ")
                    ;(form/text-field "delivered" "delivered")
                    [:div.div-separator (form/drop-down {:class "form-class"} "delivered" ["DA" "NE"])]
-                   (form/hidden-field "id" (db/get-next-id))
+                   (form/hidden-field "id" (odb/get-next-id))
                    (anti-forgery-field)
 
                    (form/submit-button "Save order"))]))
 
 (defn new-order [order]
-  (db/new-order order))
+  (odb/new-order order))
 
 ;(new-order {:full_name "GIARDINO" :amount "300" :do_date "23.12.2022" :location "Centar" :delivered "NE"})
 
@@ -384,12 +390,12 @@
 
 
 ;(edit-order (db/get-order-by-id 2))
-
+;(fodb/get-next-food-id)
 
 (defn form-new-food []
   (html5
     [:body
-     (form/form-to [:post (str "/food-order/new/"(db/get-next-food-id))]
+     (form/form-to [:post (str "/food-order/new/"(fodb/get-next-food-id))]
 
                    (form/label "do_date" "Do date: ")
                    (form/text-field "do_date" "do date")
@@ -404,7 +410,7 @@
                    [:hr]
                    (form/label "amount" " Porucena kolicina - 1000kg (oznacite polje!)")
                    [:div.div-separator (form/check-box {:class "form-class"} "amount" true 1000)]
-                   (form/hidden-field "id"(db/get-next-food-id))
+                   (form/hidden-field "id"(fodb/get-next-food-id))
                    (anti-forgery-field)
 
                    (form/submit-button "Save order"))]))

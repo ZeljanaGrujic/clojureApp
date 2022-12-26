@@ -9,10 +9,11 @@
                  [org.clojure/clojure-contrib "1.2.0"]   ;; for clojure.contrib.sql
                  [org.clojure/java.jdbc "0.7.12"]         ;; jdbc
                  [mysql/mysql-connector-java "8.0.30"]
-                 [ring/ring-anti-forgery "1.3.0"];returns the HTML for the anti-forgery field
+                 [ring/ring-anti-forgery "1.3.0"]
                  [ring/ring-defaults "0.3.4"]
-                 [ring/ring-devel "1.8.0"]]
-  :main new-application.server-config
+                 [ring/ring-devel "1.8.0"]
+                 [org.xerial/sqlite-jdbc "3.7.2"]]
+  :main ^:skip-aot new-application.core
   :target-path "target/%s"
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler new-application.core/app-handler}

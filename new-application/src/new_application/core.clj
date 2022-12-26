@@ -10,14 +10,16 @@
     [hiccup.page :refer [html5]]
     [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
     [new-application.pages :as p]
-    [new-application.db :as db]
+    ;[new-application.db :as db]
     [ring.middleware.session :as session]
     [ring.middleware.params :refer [wrap-params]]
     [ring.middleware.reload :refer [wrap-reload]]
     [ring.middleware.keyword-params :refer [wrap-keyword-params]]
     [ring.middleware.multipart-params :refer [wrap-multipart-params]]
     [new-application.administrator :as a]
-    [new-application.db-statistic :as dbs]))
+    ;[new-application.db-statistic :as dbs]
+    [new-application.orderers-db :as odb]
+    [new-application.food-orders-db :as fodb]))
 
 ;;Resenje jer baca gresku kad cita polja
 (defn full-name [full_name]
@@ -175,8 +177,8 @@
 (defroutes administrator-routes
 
            (GET "/page-orders" [] (p/base-orders-page))
-           (GET "/all-orders" [] (p/index (db/list-delivered-orders)))
-           (GET "/orders/:order-id" [order-id] (p/view-order (db/get-order-by-id (read-string order-id))))
+           (GET "/all-orders" [] (p/index (odb/list-orders)))
+           (GET "/orders/:order-id" [order-id] (p/view-order (odb/get-order-by-id (read-string order-id))))
 
 
            ;(GET "/order/:id" [id] (p/order-view (db/get-order-by-id (read-string id))))
@@ -184,25 +186,25 @@
 
            (GET "/orders/new/" [] (p/form-new-order))
            (POST "/orders/new/:id" req (do (let [order (full_name-amount-date-city_part-street-delivered-id (slurp (:body req)))]
-                                             (db/new-order order))
+                                             (odb/new-order order))
                                            (resp/redirect "/page-orders")))
 
 
-           (GET "/all-orders/update" [] (p/index-for-update (db/list-orders)))
-           (GET "/orders/new/edit/:id" [id] (p/edit-order (db/get-order-by-id (read-string id))))
+           (GET "/all-orders/update" [] (p/index-for-update (odb/list-orders)))
+           (GET "/orders/new/edit/:id" [id] (p/edit-order (odb/get-order-by-id (read-string id))))
            (POST "/orders/:id" req (do (let [order (full_name-amount-date-city_part-street-delivered-id (slurp (:body req)))]
-                                         (db/edit-order order))
+                                         (odb/edit-order order))
                                        (resp/redirect "/page-orders")))
 
 
 
-           (GET "/all-orders/delete" [] (p/index-for-delete (db/list-orders)))
-           (GET "/orders/new/delete/:id" [id] (p/form-delete-order (db/get-order-by-id (read-string id))))
+           (GET "/all-orders/delete" [] (p/index-for-delete (odb/list-orders)))
+           (GET "/orders/new/delete/:id" [id] (p/form-delete-order (odb/get-order-by-id (read-string id))))
            (POST "/orders/delete/:id" req (do (let [order (full_name-amount-date-city_part-street-delivered-id (slurp (:body req)))]
-                                                (db/delete-order order))
+                                                (odb/delete-order order))
                                               (resp/redirect "/page-orders")))
            (GET "/undelivered-orders" [] (p/index-for-undelivered-orders))
-           (GET "/undelivered-order/:cp" [cp] (p/orders-view (dbs/undelivered-cp cp)))
+           (GET "/undelivered-order/:cp" [cp] (p/orders-view (odb/undelivered-cp cp)))
 
            (GET "/orders-statistic" [] (p/base-statistic-page))
 
@@ -210,15 +212,15 @@
            (GET "/food-orders" [] (p/base-food-page))
            (GET "/food-order/new/" [] (p/form-new-food))
            (POST "/food-order/new/:id" req (do (let [food (food-do-date-month-type-amount-id (slurp (:body req)))]
-                                             (db/new-food-order food))
+                                             (fodb/new-food-order food))
                                            (resp/redirect "/food-orders")))
            (GET "/all-food-orders" [] (p/index-for-monthly-orders))
-           (GET "/month-order/:mo" [mo] (p/food-orders-view (db/list-full-forders mo)))
+           (GET "/month-order/:mo" [mo] (p/food-orders-view (fodb/list-full-forders mo)))
 
-           (GET "/all-food-orders/delete" [] (p/index-for-food-delete (db/list-full-forders-delete)))
-           (GET "/food-order/delete/:id" [id] (p/form-delete-food-order (db/get-food-order-by-id (read-string id))))
+           (GET "/all-food-orders/delete" [] (p/index-for-food-delete (fodb/list-full-forders-delete)))
+           (GET "/food-order/delete/:id" [id] (p/form-delete-food-order (fodb/get-food-order-by-id (read-string id))))
            (POST "/food-order/delete/:id" req (do (let [forder (delete-food-do-date-month-type-id (slurp (:body req)))]
-                                                (db/delete-food-order forder))
+                                                (fodb/delete-food-order forder))
                                               (resp/redirect "/food-orders")))
            (GET "/foods-statistic" [] (p/base-food-statistic-page))
            )
@@ -270,3 +272,8 @@
 ;;pokrecem aplikaciju sa lein run i na portu 3020 ce mi se pojaviti aplikacija
 
 ;;main sam dodala da bi mi se pokrenula aplikacija
+(defn -main
+  "I don't do a whole lot ... yet."
+  [& args]
+  (println "Hello, World! Your application is started on port 3027 :)"))
+;aplikaciju pokrecem iz cmd a pomocu komande lein run
