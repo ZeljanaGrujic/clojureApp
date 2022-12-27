@@ -13,8 +13,8 @@
 (defn base-orders-page [& body]
   (html5 [:head [:title "KOKODA - GRUJIC"]]
          [:link {:rel         "stylesheet"
-                 :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+                 :href        "https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+                 :integrity   "sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
                  :crossorigin "anonymous"}]
          [:body
           [:div.container
@@ -30,7 +30,7 @@
             ; [:a.nav-item.nav.link {:href "/all-orders/update"} "Izmeni"]]
             ;[:div.navbar-nav.ml-auto
             ; [:a.nav-item.nav.link {:href "/all-orders/delete"} "Obrisi"]]]
-            ][:hr]
+            ] [:hr]
            [:a {:href "/all-orders"} [:h3 "Sve porudzbine"]]
            [:a {:href "/undelivered-orders"} [:h3 "Neisporucene porudzbine"]]
            [:a {:href "/orders/new/"} [:h3 "Kreiraj novu porudzbinu"]]
@@ -42,8 +42,8 @@
 (defn base-food-page [& body]
   (html5 [:head [:title "KOKODA - GRUJIC"]]
          [:link {:rel         "stylesheet"
-                 :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+                 :href        "https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+                 :integrity   "sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
                  :crossorigin "anonymous"}]
          [:body
           [:div.container
@@ -59,7 +59,7 @@
             ; [:a.nav-item.nav.link {:href "/all-orders/update"} "Izmeni"]]
             ;[:div.navbar-nav.ml-auto
             ; [:a.nav-item.nav.link {:href "/all-orders/delete"} "Obrisi"]]]
-            ][:hr]
+            ] [:hr]
            [:a {:href "/all-food-orders"} [:h3 "Porudzbine hrane"]]
            [:a {:href "/food-order/new/"} [:h3 "Kreiraj novu porudzbinu"]]
            [:a {:href "/all-food-orders/delete"} [:h3 "Obrisi porudzbinu"]]
@@ -70,9 +70,10 @@
 
 (defn base [& body]
   (html5
-    [:head [:title "GRUJIC- agro"]]
-    [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-            :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+    [:head [:title "KOKODA - GRUJIC"]]
+    [:link {:rel         "stylesheet"
+            :href        "https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+            :integrity   "sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
             :crossorigin "anonymous"}]
     [:body
 
@@ -86,19 +87,23 @@
        [:div.navbar-nav.ml-right
         [:a.nav-item.nav.link {:href "/admin/logout"} "Odjava"]] [:hr]] body]]))
 
-(defn administrator-login []
+(defn administrator-login [& [msg]]
   (html5
+    (when msg [:div.alert.alert-danger msg])
     [:body
      (form/form-to
        [:post (str "/admin/login")]
 
-       (form/label "login" "Login:")
-       (form/text-field "login" "login")
-       (form/label "password" "Password:")
-       (form/password-field "password" "password")
-
+       [:div.form-group
+        (form/label "login" "Korisnicko ime:  ")
+        (form/text-field {:class "form-control"} "login")]
+       [:hr]
+       [:div.form-group
+        (form/label "password" "Lozinka:  ")
+        (form/password-field {:class "form-control"} "password")]
        (anti-forgery-field)
-       (form/submit-button "Login")
+       [:hr]
+       (form/submit-button {:class "btn btn-primary"} "Uloguj se")
        )]))
 
 ;(defn base-page [& body]
@@ -110,88 +115,93 @@
 ;(defn index [body]
 ;  (base body))
 
+
 (defn index [orders]
-  (base [:h1 "All Orders"]
+  (base [:h1 "Sve porudzbine"]
         (for [o orders]
-          [:h4 [:a {:href (str "/orders/" (:id o))} "ID porudzbine: " (:id o) "         Porucilac: " (:full_name o) "               Datum isporuke: " (:do_date o)]])))
+          [:div
+           [:h4 [:a {:href (str "/orders/" (:id o))} "ID porudzbine: " (:id o) "                Porucilac: " (:full_name o) "                      Datum isporuke: " (:do_date o)]]])))
 
 
 (index (odb/list-delivered-orders))
 
 
 (defn index-for-update [orders]
-  (base [:h1 "Choose order to update"]
+  (base [:h1 "Izaberi narudzbinu za izmenu:"]
         (for [o orders]
-          [:h4 [:a {:href (str "/orders/new/edit/" (:id o))} "ID porudzbine: " (:id o) "         Porucilac:  " (:full_name o) "                Datum isporuke: " (:do_date o)]])))
+          [:div [:h4 [:a {:href (str "/orders/new/edit/" (:id o))} "ID porudzbine: " (:id o) "            Porucilac:  " (:full_name o) "                    Datum isporuke: " (:do_date o)]]])))
 
 (defn index-for-delete [orders]
-  (base [:h1 "Choose order to delete"]
+  (base [:h1 "Izaberi narudzbinu za brisanje:"]
         (for [o orders]
-          [:h4 [:a {:href (str "/orders/new/delete/" (:id o))} "ID porudzbine: " (:id o) "         Porucilac:  " (:full_name o) "              Datum isporuke: " (:do_date o)]])))
+          [:div
+           [:h4 [:a {:href (str "/orders/new/delete/" (:id o))} "ID porudzbine: " (:id o) "               Porucilac:  " (:full_name o) "                     Datum isporuke: " (:do_date o)]]])))
 
 
 (defn index-for-undelivered-orders []
-  (base [:h1 "City parts for undelivered orders:"]
+  (base [:h1 "Odaberi deo grada u kome zelis da vidis neisporucene narudzbine:"]
         (for [cp ["Kolonija" "Centar" "HRS" "HIM", "VUK", "Naselje", "Mikulja", "Bolnica", "Gimnazija", "Opeka", "Jezero" "Suleiceva" "Zelengora" "GOSA" "Kiseljak"]]
-          [:h4 [:a {:href (str "/undelivered-order/"cp)} "Deo grada: " cp]])
-        ))
+          [:div [:h4 [:a {:href (str "/undelivered-order/" cp)} "Deo grada: " cp]]]
+          )))
 
 
 (defn index-for-monthly-orders []
-  (base [:h1 "Orders per month:"]
+  (base [:h1 "Narudzbine za mesec:"]
         (for [mo ["Januar" "Februar" "Mart" "April", "Maj", "Jun", "Jul", "Avgust", "Septembar", "Oktobar", "Novembar" "Decembar"]]
-          [:h4 [:a {:href (str "/month-order/"mo)} "Mesec: "mo]])
-        ))
+          [:div [:h4 [:a {:href (str "/month-order/" mo)} "Mesec: " mo]]]
+          )))
 
 (defn index-for-food-delete [forders]
-  (base [:h1 "Choose order to delete"]
+  (base [:h1 "Izaberi narudzbinu za brisanje:"]
         (for [o forders]
-          [:h4 [:a {:href (str "/food-order/delete/" (:id o))} "ID porudzbine: " (:id o) "        Datum isporuke: " (:do_date o) "            Mesec: " (:month_name o) "        Vrsta hrane: " (:type_name o)]])))
+          [:div [:h4 [:a {:href (str "/food-order/delete/" (:id o))} "ID porudzbine: " (:id o) "        Datum isporuke: " (:do_date o) "            Mesec: " (:month_name o) "        Vrsta hrane: " (:type_name o)]]]
+          )))
 
 
 (index-for-undelivered-orders)
 
 (defn view-order [order]
   (base
-    [:a {:href (str "/orders/new/edit/" (:id order))} "Edit order directly"]
+    [:a {:href (str "/orders/new/edit/" (:id order))} "Direktno izmeni porudzbinu"]
     [:hr]
     [:small (:id order) " Redni br. narudzbine"]
-    [:h2 "Narucilac: " (:full_name order) "           Porucena kolicina: " (:amount order)]
+    [:h2 "Narucilac: " (:full_name order) "           Porucena kolicina: " (:amount order) "          Cena:" (:price order)]
     [:h2 "Deo grada:  " (:city_part order) "            Ulica i broj: " (:street order)]
     [:h2 "Datum isporuke: " (:do_date order) "            Izvrsena isporuka:  " (:delivered order)]))
 
-(view-order {:id        1,
-             :full_name "Srecko Grujic",
-             :amount    "0",
-             :do_date   "00.00.0000",
-             :city_part "Naselje",
-             :street    "Dr. Cambe 10",
-             :delivered "DA"})
+(view-order {:id 2,
+             :full_name "JESA",
+             :do_date "27.12.2022.",
+             :city_part "Centar",
+             :street "Ustanicka 5",
+             :delivered "NE",
+             :amount 270,
+             :price 1650.0})
 
-(index (odb/list-orders))
+(index (odb/list-orders-all-info))
 (view-order (odb/get-order-by-id 1))
 
 
-(defn order-view [{id :id full_name :full_name amount :amount do_date :do_date city_part :city_part street :street}]
+(defn order-view [{id :id full_name :full_name do_date :do_date city_part :city_part street :street amount :amount price :price}]
   (html5
-    [:li (format " Order id: %s      Full_name: %s        Amount: %s        Do_date: %s     City part: %s   Street: %s    " id full_name amount do_date city_part street)]))
+    [:li (format " ID porudzbine: %s         Narucilac: %s          Datum isporuke: %s        Deo grada: %s          Ulica: %s         Kolicina: %s                Cena: %s " id full_name do_date city_part street amount price)]))
 
 (defn orders-view [orders]
   (html5 [:ul
-          (map  order-view orders)]))
+          (map order-view orders)]))
 
 
 (orders-view (odb/undelivered-cp "Centar"))
 
-(defn num-order-per-person [{full_name :full_name maked_orders :maked_orders}]
+(defn num-order-per-person [{full_name :full_name maked_orders :maked_orders total_amount :total_amount total_price :total_price}]
   (html5
-    [:li (format " Full name: %s            Number of maked orders: %s" full_name maked_orders)]))
+    [:li (format " Narucilac: %s            Broj naruzbina: %s       Ukupna kolicina: %s          Ukupna cena: %s " full_name maked_orders total_amount total_price)]))
 
-(num-order-per-person {:full_name "NECA", :maked_orders 9})
+(num-order-per-person {:full_name "NECA", :maked_orders 9 :total_amount 300 :price 1650})
 
 (defn persons-orders [porders]
   (html5 [:ul
-          (map  num-order-per-person porders)]))
+          (map num-order-per-person porders)]))
 (odb/orders-per-person)
 (persons-orders (odb/orders-per-person))
 
@@ -204,7 +214,7 @@
 
 (defn food-orders-view [forders]
   (html5 [:ul
-          (map  food-order-view forders)]))
+          (map food-order-view forders)]))
 
 
 
@@ -226,7 +236,7 @@
 
 (defn all-statistic-for-months [opm]
   (html5 [:ul
-          (map  total-orders-per-month opm)]))
+          (map total-orders-per-month opm)]))
 
 
 
@@ -273,34 +283,41 @@
     [:body
      (form/form-to [:post (str "/orders/new/" (odb/get-next-id))]
 
-                   (form/label "full_name" "Full name: ")
-                   (form/text-field "full_name" "ime")
+                   [:div.form-group
+                    (form/label "full_name" "Narucilac: ")
+                    (form/text-field {:class "form-control"} "full_name")]
                    [:hr]
-                   (form/label "amount" "Amount: ")
-                   (form/text-field "amount" "amount")
+                   [:div.form-group
+                    (form/label "do_date" "Datum isporuke (dd.mm.gggg.) : ")
+                    (form/text-field {:class "form-control"} "do_date" "1.1.2023")]
                    [:hr]
-                   (form/label "do_date" "Do date: ")
-                   (form/text-field "do_date" "do date")
+                   [:div.form-group
+                    (form/label "city_part" "Deo grada: ")
+                    ;(form/text-field "location" "Location")
+                    [:div.div-separator (form/drop-down {:class "form-class"} "city_part" ["Kolonija" "Centar" "HRS" "HIM", "VUK", "Naselje", "Mikulja", "Bolnica", "Gimnazija", "Opeka", "Jezero" "Suleiceva" "Zelengora" "GOSA" "Kiseljak"])]]
                    [:hr]
-                   (form/label "city_part" "City part: ")
-                   ;(form/text-field "location" "Location")
-                   [:div.div-separator (form/drop-down {:class "form-class"} "city_part" ["Kolonija" "Centar" "HRS" "HIM", "VUK", "Naselje", "Mikulja", "Bolnica", "Gimnazija", "Opeka", "Jezero" "Suleiceva" "Zelengora" "GOSA" "Kiseljak"])]
+                   [:div.form-group
+                    (form/label "street" "Ulica i broj: ")
+                    (form/text-field {:class "form-control"} "street")]
                    [:hr]
-                   (form/label "street" "Street: ")
-                   (form/text-field "street" "street")
+                   [:div.form-group
+                    (form/label "delivered" "Isporuceno (DA/NE): ")
+                    ;(form/text-field "delivered" "delivered")
+                    [:div.div-separator (form/drop-down {:class "form-class"} "delivered" ["DA" "NE"])]]
                    [:hr]
-                   (form/label "delivered" "Delivered (DA/NE): ")
-                   ;(form/text-field "delivered" "delivered")
-                   [:div.div-separator (form/drop-down {:class "form-class"} "delivered" ["DA" "NE"])]
+                   [:div.form-group
+                    (form/label "package_name" "Kolicina (br.komada) : ")
+                    [:div.div-separator (form/drop-down {:class "form-class"} "package_name" ["10komada" "20komada" "30komada" "40komada" "60komada" "70komada" "100komada" "120komada" "150komada" "180komada" "210komada" "240komada" "270komada" "300komada"])]]
+
                    (form/hidden-field "id" (odb/get-next-id))
                    (anti-forgery-field)
 
-                   (form/submit-button "Save order"))]))
+                   (form/submit-button {:class "btn btn-primary"} "Sacuvaj narudzbinu"))]))
 
 (defn new-order [order]
   (odb/new-order order))
 
-;(new-order {:full_name "GIARDINO" :amount "300" :do_date "23.12.2022" :location "Centar" :delivered "NE"})
+;(new-order {:full_name "GIARDINO" :do_date "23.12.2022" :city_part "Centar" :street "Glavna uliva" :delivered "NE" :package_name "10 komada"})
 
 
 
@@ -311,60 +328,72 @@
      (form/form-to [:post (if order
                             (str "/orders/" (:id order))
                             "/orders")]
+                   [:div.form-group
+                    (form/label "full_name" "Narucilac: ")
+                    (form/text-field {:class "form-control"} "full_name" (:full_name order))]
+                   [:hr]
+                   [:div.form-group
+                    (form/label "do_date" "Datum isporuke (dd.mm.gggg.) : ")
+                    (form/text-field {:class "form-control"} "do_date" (:do_date order))]
+                   [:hr]
+                   [:div.form-group (form/label "city_part" "Deo grada: ")
+                    ;(form/text-field "location" (:location order))
+                    (form/drop-down {:class "form-class"} "city_part" ["Kolonija" "Centar" "HRS" "HIM", "VUK", "Naselje", "Mikulja", "Bolnica", "Gimnazija", "Opeka", "Jezero" "Suleiceva" "Zelengora" "GOSA" "Kiseljak"])]
+                   [:hr]
+                   [:div.form-group
+                    (form/label "street" "Ulica i broj: ")
+                    (form/text-field {:class "form-control"} "street" (:street order))]
+                   [:hr]
+                   [:div.form-group
+                    (form/label "delivered" "Isporuceno (DA/NE): ")
+                    ;(form/text-field "deliverede" (:delivered order))
+                    (form/drop-down {:class "form-class"} "delivered" ["DA" "NE"])]
+                   [:hr]
+                   [:div.form-group
+                    (form/label "package_name" "Kolicina (br.komada) : ")
+                    [:div.div-separator (form/drop-down {:class "form-class"} "package_name" ["10komada" "20komada" "30komada" "40komada" "60komada" "70komada" "100komada" "120komada" "150komada" "180komada" "210komada" "240komada" "270komada" "300komada"])]]
 
-                   (form/label "full_name" "Full name: ")
-                   (form/text-field "full_name" (:full_name order))
-                   [:hr]
-                   (form/label "amount" "Amount: ")
-                   (form/text-field "amount" (:amount order))
-                   [:hr]
-                   (form/label "do_date" "Do date: ")
-                   (form/text-field "do_date" (:do_date order))
-                   [:hr]
-                   (form/label "city_part" "City part: ")
-                   ;(form/text-field "location" (:location order))
-                   (form/drop-down {:class "form-class"} "city_part" ["Kolonija" "Centar" "HRS" "HIM", "VUK", "Naselje", "Mikulja", "Bolnica", "Gimnazija", "Opeka", "Jezero" "Suleiceva" "Zelengora" "GOSA" "Kiseljak"])
-                   [:hr]
-                   (form/label "street" "Street: ")
-                   (form/text-field "street" (:street order))
-                   [:hr]
-                   (form/label "delivered" "Delivered (DA/NE): ")
-                   ;(form/text-field "deliverede" (:delivered order))
-                   (form/drop-down {:class "form-class"} "delivered" ["DA" "NE"])
                    (form/hidden-field "id" (:id order))
                    (anti-forgery-field)
 
-                   (form/submit-button "Save changes"))]))
+                   (form/submit-button {:class "btn btn-primary"} "Sacuvaj izmene"))]))
 
 (defn form-delete-order [order]
   (html5
     [:body
-     [:p (:id order)]
+     [:p "Broj porudzbine koja se brise: " (:id order)]
      (form/form-to [:post (if order
                             (str "/orders/delete/" (:id order))
                             "/orders")]
 
-                   (form/label "full_name" "Full name: ")
-                   (form/text-field "full_name" (:full_name order))
+                   [:div.form-group
+                    (form/label "full_name" "Narucilac: ")
+                    (form/text-field {:class "form-class"} "full_name" (:full_name order))]
                    [:hr]
-                   (form/label "amount" "Amount: ")
-                   (form/text-field "amount" (:amount order))
+                   [:div.form-group
+                    (form/label "do_date" "Datum isporuke (dd.mm.gggg.) : ")
+                    (form/text-field {:class "form-class"} "do_date" (:do_date order))]
                    [:hr]
-                   (form/label "do_date" "Do date: ")
-                   (form/text-field "do_date" (:do_date order))
+                   [:div.form-group
+                    (form/label "city_part" "Deo grada: ")
+                    (form/text-field {:class "form-class"} "city_part" (:city_part order))]
                    [:hr]
-                   (form/label "city_part" "City part: ")
-                   (form/text-field "city_part" (:city_part order))
+                   [:div.form-group
+                    (form/label "street" "Ulica i broj: ")
+                    (form/text-field {:class "form-class"} "street" (:street order))]
                    [:hr]
-                   (form/label "street" "Street: ")
-                   (form/text-field "street" (:street order))
+                   [:div.form-group
+                    (form/label "delivered" "Isporuceno (DA/NE): ")
+                    (form/text-field {:class "form-class"} "deliverede" (:delivered order))]
                    [:hr]
-                   (form/label "delivered" "Delivered (DA/NE): ")
-                   (form/text-field "deliverede" (:delivered order))
+                   [:div.form-group
+                    (form/label "package_name" "Kolicina (br.komada) : ")
+                    (form/text-field {:class "form-class"} "package_name" (:amount order))]
+
                    (form/hidden-field "id" (:id order))
                    (anti-forgery-field)
 
-                   (form/submit-button "Delete order"))]))
+                   (form/submit-button {:class "btn btn-primary"} "Izbrisi"))]))
 
 
 
@@ -376,17 +405,19 @@
                             (str "/food-order/delete/" (:id forder))
                             "/all-food-orders/delete")]
 
-                   (form/label "do_date" "Do date: ")
-                   (form/text-field "do_date" (:do_date forder))
+                   [:div.form-group
+                    (form/label "do_date" "Datum isporuke (dd.mm.gggg.) : ")
+                    (form/text-field {:class "form-class"} "do_date" (:do_date forder))]
                    [:hr]
-                   (form/label "month_name" "Month: ")
-                   (form/text-field "month_name" (:month_name forder))
+                   [:div.form-group
+                    (form/label "month_name" "Mesec: ")
+                    (form/text-field {:class "form-class"} "month_name" (:month_name forder))]
                    [:hr]
                    (form/hidden-field "type_id" (:type_id forder))
                    (form/hidden-field "id" (:id forder))
                    (anti-forgery-field)
 
-                   (form/submit-button "Delete order"))]))
+                   (form/submit-button {:class "btn btn-primary"} "Izbrisi"))]))
 
 
 ;(edit-order (db/get-order-by-id 2))
@@ -395,22 +426,26 @@
 (defn form-new-food []
   (html5
     [:body
-     (form/form-to [:post (str "/food-order/new/"(fodb/get-next-food-id))]
+     (form/form-to [:post (str "/food-order/new/" (fodb/get-next-food-id))]
 
-                   (form/label "do_date" "Do date: ")
-                   (form/text-field "do_date" "do date")
+                   [:div.form-group
+                    (form/label "do_date" "Datum isporuke (dd.mm.gggg.) : ")
+                    (form/text-field {:class "form-class"} "do_date" "dd.mm.gggg.")]
                    [:hr]
-                   (form/label "month_name" "Month: ")
-                   ;(form/text-field "location" "Location")
-                   [:div.div-separator (form/drop-down {:class "form-class"} "month_name" ["Januar" "Februar" "Mart" "April", "Maj", "Jun", "Jul", "Avgust", "Septembar", "Oktobar", "Novembar" "Decembar"])]
+                   [:div.form-group
+                    (form/label "month_name" "Mesec: ")
+                    ;(form/text-field "location" "Location")
+                    [:div.div-separator (form/drop-down {:class "form-class"} "month_name" ["Januar" "Februar" "Mart" "April", "Maj", "Jun", "Jul", "Avgust", "Septembar", "Oktobar", "Novembar" "Decembar"])]]
                    [:hr]
-                   (form/label "type_name" "Vrsta hrane: ")
-                   ;(form/text-field "delivered" "delivered")
-                   [:div.div-separator (form/drop-down {:class "form-class"} "type_name" ["Pantelic zito" "Pantelic vitamini"])]
-                   [:hr]
-                   (form/label "amount" " Porucena kolicina - 1000kg (oznacite polje!)")
-                   [:div.div-separator (form/check-box {:class "form-class"} "amount" true 1000)]
-                   (form/hidden-field "id"(fodb/get-next-food-id))
+                   [:div.form-group
+                    (form/label "type_name" "Vrsta hrane: ")
+                    ;(form/text-field "delivered" "delivered")
+                    [:div.div-separator (form/drop-down {:class "form-class"} "type_name" ["Pantelic zito" "Pantelic vitamini"])]]
+                    [:hr]
+                   [:div.form-group
+                    (form/label "amount" " Porucena kolicina - 1000kg (oznacite polje!)")
+                    [:div.div-separator (form/check-box {:class "form-class"} "amount" true 1000)]]
+                    (form/hidden-field "id" (fodb/get-next-food-id))
                    (anti-forgery-field)
 
                    (form/submit-button "Save order"))]))

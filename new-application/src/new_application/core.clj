@@ -29,15 +29,15 @@
   ;name in format Nevena+Arsic
   (clojure.string/replace street #"\+" " "))
 
-(defn full_name-amount-date-city_part-street-delivered-id [string]
+(defn full_name-date-city_part-street-delivered-package-name-id [string]
   ;string contains name and phone in this format
   ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
   (let [map {:full_name (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))
-             :amount    (clojure.string/replace (get (clojure.string/split string #"&") 1) "amount=" "")
-             :do_date   (clojure.string/replace (get (clojure.string/split string #"&") 2) "do_date=" "")
-             :city_part (clojure.string/replace (get (clojure.string/split string #"&") 3) "city_part=" "")
-             :street    (street (clojure.string/replace (get (clojure.string/split string #"&") 4) "street=" ""))
-             :delivered (clojure.string/replace (get (clojure.string/split string #"&") 5) "delivered=" "")
+             :do_date   (clojure.string/replace (get (clojure.string/split string #"&") 1) "do_date=" "")
+             :city_part (clojure.string/replace (get (clojure.string/split string #"&") 2) "city_part=" "")
+             :street    (street (clojure.string/replace (get (clojure.string/split string #"&") 3) "street=" ""))
+             :delivered (clojure.string/replace (get (clojure.string/split string #"&") 4) "delivered=" "")
+             :package_name    (clojure.string/replace (get (clojure.string/split string #"&") 5) "package_name=" "")
              :id        (clojure.string/replace (get (clojure.string/split string #"&") 6) "id=" "")}] map))
 
 (defn administrator [string]
@@ -70,6 +70,7 @@
          [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
                  :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
                  :crossorigin "anonymous"}]
+
          [:body
           [:div.container
            [:h1 "KOKODA - GRUJIC"]
@@ -78,7 +79,6 @@
             [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
             [:div.navbar-nav.ml-auto
              [:a.nav-item.nav.link {:href "/admin/login"} "     Prijava           "]
-             [:a.nav-item.nav.link  ""]
              ;[:a.nav-item.nav.link {:href "/page-orders"} "Porudzbine"]
              ; [:a.nav-item.nav.link {:href "/orders/new/"} "   Nova porudzbina   "]
              ;[:a.nav-item.nav.link {:href "/all-orders/update"} "   Izmeni porudzbinu   "]
@@ -106,7 +106,7 @@
                (if (a/check-credentials administrator)
                  (-> (resp/redirect "/")
                      (assoc-in [:session :admin] true))     ;u http zahtev dodaje se polje :session{:admin true}
-                 (p/administrator-login))))
+                 (p/administrator-login "Neispravno korisnicko ime ili loznka"))))
 
 
            (GET "/admin/logout" []
@@ -185,14 +185,14 @@
 
 
            (GET "/orders/new/" [] (p/form-new-order))
-           (POST "/orders/new/:id" req (do (let [order (full_name-amount-date-city_part-street-delivered-id (slurp (:body req)))]
+           (POST "/orders/new/:id" req (do (let [order (full_name-date-city_part-street-delivered-package-name-id (slurp (:body req)))]
                                              (odb/new-order order))
                                            (resp/redirect "/page-orders")))
 
 
            (GET "/all-orders/update" [] (p/index-for-update (odb/list-orders)))
            (GET "/orders/new/edit/:id" [id] (p/edit-order (odb/get-order-by-id (read-string id))))
-           (POST "/orders/:id" req (do (let [order (full_name-amount-date-city_part-street-delivered-id (slurp (:body req)))]
+           (POST "/orders/:id" req (do (let [order (full_name-date-city_part-street-delivered-package-name-id (slurp (:body req)))]
                                          (odb/edit-order order))
                                        (resp/redirect "/page-orders")))
 
@@ -200,7 +200,7 @@
 
            (GET "/all-orders/delete" [] (p/index-for-delete (odb/list-orders)))
            (GET "/orders/new/delete/:id" [id] (p/form-delete-order (odb/get-order-by-id (read-string id))))
-           (POST "/orders/delete/:id" req (do (let [order (full_name-amount-date-city_part-street-delivered-id (slurp (:body req)))]
+           (POST "/orders/delete/:id" req (do (let [order (full_name-date-city_part-street-delivered-package-name-id (slurp (:body req)))]
                                                 (odb/delete-order order))
                                               (resp/redirect "/page-orders")))
            (GET "/undelivered-orders" [] (p/index-for-undelivered-orders))
@@ -240,7 +240,7 @@
       session/wrap-session))
 
 (def server
-  (ring/run-jetty wrapping {:port 3027 :join? false}))
+  (ring/run-jetty wrapping {:port 3030 :join? false}))
 
 
 
@@ -275,5 +275,5 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World! Your application is started on port 3027 :)"))
+  (println "Hello, World! Your application is started on port 3029 :)"))
 ;aplikaciju pokrecem iz cmd a pomocu komande lein run
