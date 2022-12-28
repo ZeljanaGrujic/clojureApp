@@ -60,6 +60,14 @@
 
 (list-full-forders "Januar")
 
+(defn list-type-names []
+  (sql/query sql-db ["SELECT DISTINCT type_name FROM food_types"]))
+(list-type-names)
+
+(defn list-full-forders-by-name [type_name]
+  (sql/query sql-db ["SELECT food_orders.id, food_orders.amount, food_orders.do_date, food_orders.month_name FROM food_orders JOIN food_types ON food_orders.type_id =food_types.id WHERE food_types.type_name= ?"type_name]))
+
+
 (defn list-full-forders-delete []
   (sql/query sql-db ["SELECT food_orders.id, food_orders.amount, food_orders.do_date, food_orders.month_name, food_types.type_name FROM food_orders JOIN food_types ON food_orders.type_id =food_types.id"]))
 

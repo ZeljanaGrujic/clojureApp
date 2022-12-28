@@ -36,8 +36,11 @@
            [:a {:href "/orders/new/"} [:h3 "Kreiraj novu porudzbinu"]]
            [:a {:href "/all-orders/update"} [:h3 "Izmeni porudzbinu"]]
            [:a {:href "/all-orders/delete"} [:h3 "Obrisi porudzbinu"]]
+           [:a {:href "/orders-search"} [:h3 "Porucioci"]]
            [:a {:href "/orders-statistic"} [:h3 "Statisticki izvestaj"]]
            body]]))
+
+(base-orders-page)
 
 (defn base-food-page [& body]
   (html5 [:head [:title "KOKODA - GRUJIC"]]
@@ -63,6 +66,7 @@
            [:a {:href "/all-food-orders"} [:h3 "Porudzbine hrane"]]
            [:a {:href "/food-order/new/"} [:h3 "Kreiraj novu porudzbinu"]]
            [:a {:href "/all-food-orders/delete"} [:h3 "Obrisi porudzbinu"]]
+           [:a {:href "/food-orders/search"} [:h3 "Porucena hrana"]]
            [:a {:href "/foods-statistic"} [:h3 "Statisticki izvestaj"]]
            body]]))
 
@@ -169,14 +173,14 @@
     [:h2 "Deo grada:  " (:city_part order) "            Ulica i broj: " (:street order)]
     [:h2 "Datum isporuke: " (:do_date order) "            Izvrsena isporuka:  " (:delivered order)]))
 
-(view-order {:id 2,
+(view-order {:id        2,
              :full_name "JESA",
-             :do_date "27.12.2022.",
+             :do_date   "27.12.2022.",
              :city_part "Centar",
-             :street "Ustanicka 5",
+             :street    "Ustanicka 5",
              :delivered "NE",
-             :amount 270,
-             :price 1650.0})
+             :amount    270,
+             :price     1650.0})
 
 (index (odb/list-orders-all-info))
 (view-order (odb/get-order-by-id 1))
@@ -187,8 +191,15 @@
     [:li (format " ID porudzbine: %s         Narucilac: %s          Datum isporuke: %s        Deo grada: %s          Ulica: %s         Kolicina: %s                Cena: %s " id full_name do_date city_part street amount price)]))
 
 (defn orders-view [orders]
-  (html5 [:ul
-          (map order-view orders)]))
+  (if (= orders ())
+    (html5 [:h2 "Nema porudzbina za ovaj deo grada"])
+    (html5 [:ul
+            (map order-view orders)])))
+
+(defn orders-view2 [& [orders]]
+  (when orders (html5 [:ul
+                       (map order-view orders)])))
+
 
 
 (orders-view (odb/undelivered-cp "Centar"))
@@ -210,11 +221,13 @@
 
 (defn food-order-view [{id :id amount :amount do_date :do_date month_name :month_name type_name :type_name}]
   (html5
-    [:li (format " Order id: %s         Amount: %s           Do_date: %s         Type: %s    " id amount do_date type_name)]))
+    [:li (format " ID naruzbine: %s         Kolicina: %s           Datum isporuke: %s         Vrsta hrane: %s    " id amount do_date type_name)]))
 
 (defn food-orders-view [forders]
-  (html5 [:ul
-          (map food-order-view forders)]))
+  (if (= forders ())
+    (html5 [:h2 "Nema porudzbina za ovaj mesec"])
+    (html5 [:ul
+            (map food-order-view forders)])))
 
 
 
@@ -232,11 +245,14 @@
 
 (defn total-orders-per-month [{month_name :month_name monthly_orders :monthly_orders total_price :total_price total_amount :total_amount}]
   (html5
-    [:li (format " Month: %s            Number of maked orders: %s        Total price: %s           Total amount: %s" month_name monthly_orders total_price total_amount)]))
+    [:li (format " Mesec: %s            Broj narudzbina: %s        Ukupna cena: %s           Ukupna kolicina: %s" month_name monthly_orders total_price total_amount)]))
 
 (defn all-statistic-for-months [opm]
-  (html5 [:ul
-          (map total-orders-per-month opm)]))
+  (if (= opm ())
+    (html5 [:h2 "Nema porudzbina za ovaj mesec"])
+    (html5 [:ul
+            (map total-orders-per-month opm)])))
+(all-statistic-for-months (fodb/list-full-forders "April"))
 
 
 
@@ -441,11 +457,11 @@
                     (form/label "type_name" "Vrsta hrane: ")
                     ;(form/text-field "delivered" "delivered")
                     [:div.div-separator (form/drop-down {:class "form-class"} "type_name" ["Pantelic zito" "Pantelic vitamini"])]]
-                    [:hr]
+                   [:hr]
                    [:div.form-group
                     (form/label "amount" " Porucena kolicina - 1000kg (oznacite polje!)")
                     [:div.div-separator (form/check-box {:class "form-class"} "amount" true 1000)]]
-                    (form/hidden-field "id" (fodb/get-next-food-id))
+                   (form/hidden-field "id" (fodb/get-next-food-id))
                    (anti-forgery-field)
 
                    (form/submit-button "Save order"))]))
@@ -457,3 +473,37 @@
 ;ovo cu verovatno ovako da pravim za pitanja
 
 
+;(defn form-search-order []
+;  (html5
+;    [:body
+;     (form/form-to [:post (str "/orders/search/")]
+;
+;                   [:div.form-group
+;                    (form/label "full_name" "Pretraga po nazivu narucioca: ")
+;                    (form/text-field {:class "form-control"} "full_name")]
+;                   [:hr]
+;                   (anti-forgery-field)
+;
+;                   (form/submit-button {:class "btn btn-primary"} "Pretrazi"))]))
+
+(defn all-orderers [orderers]
+  (base [:h1 "Svi porucioci"]
+        (for [o orderers]
+          [:div
+           [:h4 [:a {:href (str "/orderer/" (:full_name o))} " Porucilac: " (:full_name o)]]])))
+(all-orderers (odb/list-orderers-names))
+
+(defn all-food-types [food-types]
+  (base [:h1 "Vrste hrane"]
+        (for [ft food-types]
+          [:div
+           [:h4 [:a {:href (str "/food-type/"(:type_name ft))} " Vrsta hrane: " (:type_name ft)]]])))
+(all-food-types (fodb/list-type-names))
+
+(defn food-order-view2 [{id :id amount :amount do_date :do_date month_name :month_name}]
+  (html5
+    [:li (format " ID naruzbine: %s         Kolicina: %s           Datum isporuke: %s      " id amount do_date )]))
+
+(defn food-orders-view2 [forders]
+  (html5 [:ul
+          (map food-order-view2 forders)]))

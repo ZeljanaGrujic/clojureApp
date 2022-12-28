@@ -7,7 +7,7 @@
     [hiccup.form :as form]
     [ring.util.response :as resp]
     [ring.util.request :as req]
-    [hiccup.page :refer [html5]]
+    [hiccup.page :refer [html5 include-css include-js]]
     [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
     [new-application.pages :as p]
     ;[new-application.db :as db]
@@ -40,6 +40,12 @@
              :package_name    (clojure.string/replace (get (clojure.string/split string #"&") 5) "package_name=" "")
              :id        (clojure.string/replace (get (clojure.string/split string #"&") 6) "id=" "")}] map))
 
+(defn just-full-name [string]
+  ;string contains name and phone in this format
+  ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
+  (let [map {:full_name (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))}] map))
+
+
 (defn administrator [string]
   (let [map {:login    (clojure.string/replace (get (clojure.string/split string #"&") 0) "login=" "")
              :password (clojure.string/replace (get (clojure.string/split string #"&") 1) "password=" "")}] map))
@@ -63,15 +69,20 @@
              :id        (clojure.string/replace (get (clojure.string/split string #"&") 3) "id=" "")}] map))
 
 ;;RUTE
-
+;;dodala bih background image, zato sam probala view i background css ali ne ide
 (defn base-page [& body]
   ;basic template for all our pages
   (html5 [:head [:title "KOKODA - GRUJIC"]]
          [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
                  :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
                  :crossorigin "anonymous"}]
+         [:link {:rel         "stylesheet"
+                 :type "txt/css"
+                 :href "background.css"
+                 }]
 
          [:body
+          [:div {:class "bg"}
           [:div.container
            [:h1 "KOKODA - GRUJIC"]
            [:h2 "Dnevnik klijenata i prodaje jaja"]
@@ -86,7 +97,9 @@
              [:a.nav-item.nav.link {:href "/admin/logout"} "        Odjava        "]]] [:hr]
            [:a {:href "/page-orders"} [:h3 "Porucivanje jaja"]]
            [:a {:href "/food-orders"} [:h3 "Porucivanje hrane"]]
-           body]]))
+           body]]]))
+
+(base-page)
 
 
 
@@ -223,6 +236,19 @@
                                                 (fodb/delete-food-order forder))
                                               (resp/redirect "/food-orders")))
            (GET "/foods-statistic" [] (p/base-food-statistic-page))
+
+
+           (GET "/orders-search" [] (p/all-orderers (odb/list-orderers-names)))
+            (GET "/orderer/:name" [name] (p/orders-view (odb/list-orders-by-name name)))
+           ;htela sam da mi se kuca u polju ime, pa da se otvara stranica ali nisam znala da uradim, pa sam uradila preko linkova
+           ;(POST "/orders/search/:name" req (do (let [order (just-full-name (slurp (:body req)))]
+           ;                                       (odb/list-orders-by-name order)))
+           ;                                (resp/redirect "/page-orders"))
+
+
+           (GET "/food-orders/search" [] (p/all-food-types (fodb/list-type-names)))
+           (GET "/food-type/:name" [name] (p/food-orders-view2 (fodb/list-full-forders-by-name name)))
+
            )
 
 ;handler je funkcija koja prima zahtev i vraca odgovor

@@ -92,6 +92,17 @@
 (defn list-orders-all-info []
   (sql/query sql-db ["SELECT orderers.id, full_name, do_date, city_part, street, delivered, amount, price
    FROM orderers JOIN orders_types ON orderers.amount_id = orders_types.id"]))
+
+(defn list-orders-by-name [full_name]
+  (sql/query sql-db ["SELECT orderers.id, full_name, do_date, city_part, street, delivered, amount, price
+   FROM orderers JOIN orders_types ON orderers.amount_id = orders_types.id WHERE full_name=?" full_name]))
+
+
+(defn list-orderers-names []
+  (sql/query sql-db ["SELECT DISTINCT full_name FROM orderers"]))
+(list-orderers-names)
+
+
 (list-orders-all-info)
 
 ;(for [o (list-orders)]
