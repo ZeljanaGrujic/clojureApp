@@ -6,7 +6,8 @@
     ;[new-application.db :as db]
     ;[new-application.db-statistic :as dbs]
     [new-application.orderers-db :as odb]
-    [new-application.food-orders-db :as fodb]))
+    [new-application.food-orders-db :as fodb]
+    [new-application.users-db :as udb]))
 
 
 
@@ -33,7 +34,7 @@
             ] [:hr]
            [:a {:href "/all-orders"} [:h3 "Sve porudzbine"]]
            [:a {:href "/undelivered-orders"} [:h3 "Neisporucene porudzbine"]]
-           [:a {:href "/orders/new/"} [:h3 "Kreiraj novu porudzbinu"]]
+           ;[:a {:href "/orders/new/"} [:h3 "Kreiraj novu porudzbinu"]]
            [:a {:href "/all-orders/update"} [:h3 "Izmeni porudzbinu"]]
            [:a {:href "/all-orders/delete"} [:h3 "Obrisi porudzbinu"]]
            [:a {:href "/orders-search"} [:h3 "Porucioci"]]
@@ -507,3 +508,52 @@
 (defn food-orders-view2 [forders]
   (html5 [:ul
           (map food-order-view2 forders)]))
+
+
+;;REGISTRACIJA/LOGOVANJE USER-a
+
+(defn user-register [& [msg]]
+  (html5
+    (when msg [:div.alert.alert-danger msg])
+    [:body
+     (form/form-to
+       [:post (str "/user/register/" (udb/get-next-user-id))]
+
+       [:div.form-group
+        (form/label "owner_name" "Ime vlasnika:  ")
+        (form/text-field {:class "form-control"} "owner_name")]
+       [:hr]
+       [:div.form-group
+        (form/label "owner_surname" "Prezime vlasnika:  ")
+        (form/text-field {:class "form-control"} "owner_surname")]
+       [:hr]
+       [:div.form-group
+        (form/label "phone" "Broj telefona (06*-****-***) :  ")
+        (form/text-field {:class "form-control"} "phone")]
+       [:hr]
+       [:div.form-group
+        (form/label "password" "Lozinka:  ")
+        (form/password-field {:class "form-control"} "password")]
+       (anti-forgery-field)
+       [:hr]
+       (form/submit-button {:class "btn btn-primary"} "Registruj se")
+       )]))
+
+(defn user-login [& [msg]]
+  (html5
+    (when msg [:div.alert.alert-danger msg])
+    [:body
+     (form/form-to
+       [:post (str "/user/login")]
+
+       [:div.form-group
+        (form/label "phone" "Broj telefona (06*-****-***) :  ")
+        (form/text-field {:class "form-control"} "phone")]
+       [:hr]
+       [:div.form-group
+        (form/label "password" "Lozinka:  ")
+        (form/password-field {:class "form-control"} "password")]
+       (anti-forgery-field)
+       [:hr]
+       (form/submit-button {:class "btn btn-primary"} "Uloguj se")
+       )]))

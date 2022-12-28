@@ -19,7 +19,8 @@
     [new-application.administrator :as a]
     ;[new-application.db-statistic :as dbs]
     [new-application.orderers-db :as odb]
-    [new-application.food-orders-db :as fodb]))
+    [new-application.food-orders-db :as fodb]
+    [new-application.users-db :as udb]))
 
 ;;Resenje jer baca gresku kad cita polja
 (defn full-name [full_name]
@@ -51,6 +52,19 @@
              :password (clojure.string/replace (get (clojure.string/split string #"&") 1) "password=" "")}] map))
 
 
+(defn register-user [string]
+  (let [map {:owner_name    (clojure.string/replace (get (clojure.string/split string #"&") 0) "owner_name=" "")
+             :owner_surname (clojure.string/replace (get (clojure.string/split string #"&") 1) "owner_surname=" "")
+             :phone (clojure.string/replace (get (clojure.string/split string #"&") 2) "phone=" "")
+             :password (clojure.string/replace (get (clojure.string/split string #"&") 3) "password=" "")}] map))
+
+(defn login-user [string]
+  (let [map {
+             :phone (clojure.string/replace (get (clojure.string/split string #"&") 0) "phone=" "")
+             :password (clojure.string/replace (get (clojure.string/split string #"&") 1) "password=" "")}] map))
+
+
+
 (defn food-do-date-month-type-amount-id [string]
   ;string contains name and phone in this format
   ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
@@ -70,6 +84,7 @@
 
 ;;RUTE
 ;;dodala bih background image, zato sam probala view i background css ali ne ide
+;;jedino bih mozda morala da pravim bukvalne html stranice kao posebne viewe pa da ih zovem, a to mi deluje kao puno posla
 (defn base-page [& body]
   ;basic template for all our pages
   (html5 [:head [:title "KOKODA - GRUJIC"]]
@@ -89,21 +104,67 @@
            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
             [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
             [:div.navbar-nav.ml-auto
-             [:a.nav-item.nav.link {:href "/admin/login"} "     Prijava           "]
-             ;[:a.nav-item.nav.link {:href "/page-orders"} "Porudzbine"]
-             ; [:a.nav-item.nav.link {:href "/orders/new/"} "   Nova porudzbina   "]
-             ;[:a.nav-item.nav.link {:href "/all-orders/update"} "   Izmeni porudzbinu   "]
-             ; [:a.nav-item.nav.link {:href "/all-orders/delete"} "   Izbrisi porudzbinu    "]
-             [:a.nav-item.nav.link {:href "/admin/logout"} "        Odjava        "]]] [:hr]
-           [:a {:href "/page-orders"} [:h3 "Porucivanje jaja"]]
-           [:a {:href "/food-orders"} [:h3 "Porucivanje hrane"]]
+             [:a.nav-item.nav.link {:href "/admin/login"} "Admin-prijava"]
+             [:a.nav-item.nav.link {:href "/admin/logout"} "Admin-odjava"]
+             [:a.nav-item.nav.link {:href "/user/register/"} "Registruj se"]
+             [:a.nav-item.nav.link {:href "/user/login"} "Prijava"]
+             [:a.nav-item.nav.link {:href "/user/logout"} "Odjava"]
+             ]] [:hr]
            body]]]))
 
-(base-page)
+(defn base-page-admin [& body]
+  ;basic template for all our pages
+  (html5 [:head [:title "KOKODA - GRUJIC"]]
+         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+                 :crossorigin "anonymous"}]
+         [:link {:rel         "stylesheet"
+                 :type "txt/css"
+                 :href "background.css"
+                 }]
+
+         [:body
+          [:div {:class "bg"}
+           [:div.container
+            [:h1 "KOKODA - GRUJIC"]
+            [:h2 "Dnevnik klijenata i prodaje jaja"]
+            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
+             [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
+             [:div.navbar-nav.ml-auto
+              [:a.nav-item.nav.link {:href "/admin/login"} "Admin-prijava"]
+              [:a.nav-item.nav.link {:href "/admin/logout"} "Admin-odjava"]
+              ]] [:hr]
+            [:a {:href "/page-orders"} [:h3 "Porucivanje jaja"]]
+            [:a {:href "/food-orders"} [:h3 "Porucivanje hrane"]]
+            body]]]))
 
 
+(defn base-page-user [& body]
+  ;basic template for all our pages
+  (html5 [:head [:title "KOKODA - GRUJIC"]]
+         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+                 :crossorigin "anonymous"}]
+         [:link {:rel         "stylesheet"
+                 :type "txt/css"
+                 :href "background.css"
+                 }]
 
-(base-page)
+         [:body
+          [:div {:class "bg"}
+           [:div.container
+            [:h1 "KOKODA - GRUJIC"]
+            [:h2 "Dnevnik klijenata i prodaje jaja"]
+            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
+             [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
+             [:div.navbar-nav.ml-auto
+              [:a.nav-item.nav.link {:href "/user/register/"} "Registruj se"]
+              [:a.nav-item.nav.link {:href "/user/login"} "Prijava"]
+              [:a.nav-item.nav.link {:href "/user/logout"} "Odjava"]
+              ]] [:hr]
+            [:a {:href "/orders/new/"} [:h3 "Porucivanje jaja"]]
+            body]]]))
+
 
 
 (defroutes app-routes
@@ -111,13 +172,13 @@
            (GET "/admin/login" [:as {session :session}]
              ; if admin is already logged in then go to index page
              (if (:admin session)
-               (resp/redirect "/")
+               (resp/redirect "/admin/home")
                (p/administrator-login)))
 
            (POST "/admin/login" req
              (let [administrator (administrator (slurp (:body req)))]
                (if (a/check-credentials administrator)
-                 (-> (resp/redirect "/")
+                 (-> (resp/redirect "/admin/home")
                      (assoc-in [:session :admin] true))     ;u http zahtev dodaje se polje :session{:admin true}
                  (p/administrator-login "Neispravno korisnicko ime ili loznka"))))
 
@@ -125,6 +186,29 @@
            (GET "/admin/logout" []
              (-> (resp/redirect "/")
                  (assoc-in [:session :admin] false)))
+
+
+           ;;ZA REGISTRACIJU I LOGIN USERA
+           (GET "/user/register/" [] (p/user-register))
+           (POST "/user/register/:id" req (do (let [user (register-user (slurp (:body req)))]
+                                                (udb/create-user user))
+                                              (resp/redirect "/user/login")))
+           (GET "/user/login" [:as {session :session}]
+             ; if admin is already logged in then go to index page
+             (if (:user session)
+               (resp/redirect "/user/home")
+               (p/user-login)))
+
+           (POST "/user/login" req
+             (let [user (login-user (slurp (:body req)))]
+               (if (udb/check-credentials user)
+                 (-> (resp/redirect "/user/home")
+                     (assoc-in [:session :user] true))     ;u http zahtev dodaje se polje :session{:admin true}
+                 (p/administrator-login "Neispravno korisnicko ime ili loznka"))))
+
+           (GET "/user/logout" []
+             (-> (resp/redirect "/")
+                 (assoc-in [:session :user] false)))
 
 
 
@@ -189,6 +273,7 @@
 
 (defroutes administrator-routes
 
+           (GET "/admin/home" [] (base-page-admin))
            (GET "/page-orders" [] (p/base-orders-page))
            (GET "/all-orders" [] (p/index (odb/list-orders)))
            (GET "/orders/:order-id" [order-id] (p/view-order (odb/get-order-by-id (read-string order-id))))
@@ -197,10 +282,10 @@
            ;(GET "/order/:id" [id] (p/order-view (db/get-order-by-id (read-string id))))
 
 
-           (GET "/orders/new/" [] (p/form-new-order))
-           (POST "/orders/new/:id" req (do (let [order (full_name-date-city_part-street-delivered-package-name-id (slurp (:body req)))]
-                                             (odb/new-order order))
-                                           (resp/redirect "/page-orders")))
+           ;(GET "/orders/new/" [] (p/form-new-order))
+           ;(POST "/orders/new/:id" req (do (let [order (full_name-date-city_part-street-delivered-package-name-id (slurp (:body req)))]
+           ;                                  (odb/new-order order))
+           ;                                (resp/redirect "/page-orders")))
 
 
            (GET "/all-orders/update" [] (p/index-for-update (odb/list-orders)))
@@ -249,6 +334,17 @@
            (GET "/food-orders/search" [] (p/all-food-types (fodb/list-type-names)))
            (GET "/food-type/:name" [name] (p/food-orders-view2 (fodb/list-full-forders-by-name name)))
 
+
+
+           )
+
+(defroutes user-routes
+
+           (GET "/user/home" [] (base-page-user))
+           (GET "/orders/new/" [] (p/form-new-order))
+           (POST "/orders/new/:id" req (do (let [order (full_name-date-city_part-street-delivered-package-name-id (slurp (:body req)))]
+                                             (odb/new-order order))
+                                           (resp/redirect "//user/home")))
            )
 
 ;handler je funkcija koja prima zahtev i vraca odgovor
@@ -259,8 +355,15 @@
     (if (-> req :session :admin)
       (handler req)
       (resp/redirect "/admin/login"))))
+(defn wrap-user-only [handler]
+  (fn [req]
+    (if (-> req :session :user)
+      (handler req)
+      (resp/redirect "/user/login"))))
+
 (def wrapping
   (-> (routes (wrap-routes administrator-routes wrap-admin-only)
+              (wrap-routes user-routes wrap-user-only)
               app-routes)
       wrap-multipart-params
       session/wrap-session))
