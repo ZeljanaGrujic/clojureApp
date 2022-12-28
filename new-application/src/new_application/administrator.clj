@@ -8,5 +8,6 @@
 (defn check-credentials [{ login :login password :password}]
   (and (= login administrator-login)
        (= password administrator-pass)))
+(check-credentials {:login "admin" :password "admin" })
 
 ;wrepovacemo nas app hendler with session midleware

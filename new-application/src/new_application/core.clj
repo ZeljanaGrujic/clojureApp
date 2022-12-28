@@ -20,7 +20,8 @@
     ;[new-application.db-statistic :as dbs]
     [new-application.orderers-db :as odb]
     [new-application.food-orders-db :as fodb]
-    [new-application.users-db :as udb]))
+    ; [new-application.users-db :as udb]
+    ))
 
 ;;Resenje jer baca gresku kad cita polja
 (defn full-name [full_name]
@@ -40,6 +41,18 @@
              :delivered (clojure.string/replace (get (clojure.string/split string #"&") 4) "delivered=" "")
              :package_name    (clojure.string/replace (get (clojure.string/split string #"&") 5) "package_name=" "")
              :id        (clojure.string/replace (get (clojure.string/split string #"&") 6) "id=" "")}] map))
+
+(defn full_name-date-city_part-street-delivered-package-name-phone-id [string]
+  ;string contains name and phone in this format
+  ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
+  (let [map {:full_name (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))
+             :do_date   (clojure.string/replace (get (clojure.string/split string #"&") 1) "do_date=" "")
+             :city_part (clojure.string/replace (get (clojure.string/split string #"&") 2) "city_part=" "")
+             :street    (street (clojure.string/replace (get (clojure.string/split string #"&") 3) "street=" ""))
+             :delivered (clojure.string/replace (get (clojure.string/split string #"&") 4) "delivered=" "")
+             :package_name    (clojure.string/replace (get (clojure.string/split string #"&") 5) "package_name=" "")
+             :phone    (clojure.string/replace (get (clojure.string/split string #"&") 6) "phone=" "")
+             :id        (clojure.string/replace (get (clojure.string/split string #"&") 7) "id=" "")}] map))
 
 (defn just-full-name [string]
   ;string contains name and phone in this format
@@ -191,7 +204,7 @@
            ;;ZA REGISTRACIJU I LOGIN USERA
            (GET "/user/register/" [] (p/user-register))
            (POST "/user/register/:id" req (do (let [user (register-user (slurp (:body req)))]
-                                                (udb/create-user user))
+                                                (odb/create-user user))
                                               (resp/redirect "/user/login")))
            (GET "/user/login" [:as {session :session}]
              ; if admin is already logged in then go to index page
@@ -199,17 +212,17 @@
                (resp/redirect "/user/home")
                (p/user-login)))
 
+
            (POST "/user/login" req
              (let [user (login-user (slurp (:body req)))]
-               (if (udb/check-credentials user)
+               (if (= (try (odb/check-credentials user) (catch Exception e (p/user-login "Neispravno korisnicko ime ili loznka"))) user)
                  (-> (resp/redirect "/user/home")
                      (assoc-in [:session :user] true))     ;u http zahtev dodaje se polje :session{:admin true}
-                 (p/administrator-login "Neispravno korisnicko ime ili loznka"))))
+                 (p/user-login "Neispravno korisnicko ime ili loznka"))))
 
            (GET "/user/logout" []
              (-> (resp/redirect "/")
                  (assoc-in [:session :user] false)))
-
 
 
            (GET "/" [] (base-page))
@@ -276,7 +289,7 @@
            (GET "/admin/home" [] (base-page-admin))
            (GET "/page-orders" [] (p/base-orders-page))
            (GET "/all-orders" [] (p/index (odb/list-orders)))
-           (GET "/orders/:order-id" [order-id] (p/view-order (odb/get-order-by-id (read-string order-id))))
+           (GET "/orders/:order-id" [order-id] (p/view-order (odb/get-order-by-id1 (read-string order-id))))
 
 
            ;(GET "/order/:id" [id] (p/order-view (db/get-order-by-id (read-string id))))
@@ -342,9 +355,9 @@
 
            (GET "/user/home" [] (base-page-user))
            (GET "/orders/new/" [] (p/form-new-order))
-           (POST "/orders/new/:id" req (do (let [order (full_name-date-city_part-street-delivered-package-name-id (slurp (:body req)))]
+           (POST "/orders/new/:id" req (do (let [order (full_name-date-city_part-street-delivered-package-name-phone-id (slurp (:body req)))]
                                              (odb/new-order order))
-                                           (resp/redirect "//user/home")))
+                                           (resp/redirect "/user/home")))
            )
 
 ;handler je funkcija koja prima zahtev i vraca odgovor
@@ -406,3 +419,7 @@
   [& args]
   (println "Hello, World! Your application is started on port 3029 :)"))
 ;aplikaciju pokrecem iz cmd a pomocu komande lein run
+
+
+;(if (= {:phone "0600323058" :password "123"} {:phone "0600323058" :password "123"})
+;  "Equal")

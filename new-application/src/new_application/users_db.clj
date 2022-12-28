@@ -21,7 +21,7 @@
 ;                     password varchar(255) );"
 ;                    )
 
-(p/print-table (sql/query sql-db ["SELECT * FROM users"]))
+;(p/print-table (sql/query sql-db ["SELECT * FROM users"]))
 
 
 ;;vrsicu proveru preko password i phone
@@ -36,3 +36,7 @@
 (defn get-next-user-id []
   (+ 1 (:m (nth (sql/query sql-db ["SELECT MAX(id) as m FROM users"]) 0))))
 (get-next-user-id)
+
+(defn get-user-id-by-phone [phone]
+  (:id (nth (sql/query sql-db ["SELECT id FROM users WHERE phone=?" phone]) 0)))
+(get-user-id-by-phone "0600133611")

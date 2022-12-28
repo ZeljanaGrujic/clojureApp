@@ -172,7 +172,8 @@
     [:small (:id order) " Redni br. narudzbine"]
     [:h2 "Narucilac: " (:full_name order) "           Porucena kolicina: " (:amount order) "          Cena:" (:price order)]
     [:h2 "Deo grada:  " (:city_part order) "            Ulica i broj: " (:street order)]
-    [:h2 "Datum isporuke: " (:do_date order) "            Izvrsena isporuka:  " (:delivered order)]))
+    [:h2 "Datum isporuke: " (:do_date order) "            Izvrsena isporuka:  " (:delivered order)]
+    [:h2 "Telefon narucioca: " (:phone order) ]))
 
 (view-order {:id        2,
              :full_name "JESA",
@@ -318,13 +319,17 @@
                     (form/text-field {:class "form-control"} "street")]
                    [:hr]
                    [:div.form-group
-                    (form/label "delivered" "Isporuceno (DA/NE): ")
+                    (form/label "delivered" "Isporuceno (DA/NE) : ")
                     ;(form/text-field "delivered" "delivered")
-                    [:div.div-separator (form/drop-down {:class "form-class"} "delivered" ["DA" "NE"])]]
+                    [:div.div-separator (form/drop-down {:class "form-class"} "delivered" [ "NE"])]]
                    [:hr]
                    [:div.form-group
                     (form/label "package_name" "Kolicina (br.komada) : ")
                     [:div.div-separator (form/drop-down {:class "form-class"} "package_name" ["10komada" "20komada" "30komada" "40komada" "60komada" "70komada" "100komada" "120komada" "150komada" "180komada" "210komada" "240komada" "270komada" "300komada"])]]
+                    [:hr]
+                   [:div.form-group
+                    (form/label "phone" "Telefon: ")
+                    (form/text-field {:class "form-control"} "phone")]
 
                    (form/hidden-field "id" (odb/get-next-id))
                    (anti-forgery-field)
