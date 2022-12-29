@@ -28,19 +28,21 @@
     ;[ring.util.anti-forgery :refer [anti-forgery-field]]
     ;[ring.middleware.anti-forgery :refer [*anti-forgery-token*]]
     ))
-(declare ^:dynamic *app-context*)
+;(declare ^:dynamic *app-context*) this should be used to enable multiuser feature, but I don't know how to implement it in my app
 
-;;Resenje jer baca gresku kad cita polja
+;;Solution for post method when I want to read some info from text field
+;;When I put two words in txt field, and space between them the + is added, so I want to remove that and to get clean info
+;;this solution slove that problem
 (defn full-name [full_name]
-  ;name in format Nevena+Arsic
+  ;name in format name+surname
   (clojure.string/replace full_name #"\+" " "))
 (defn street [street]
-  ;name in format Nevena+Arsic
   (clojure.string/replace street #"\+" " "))
 
 (defn full_name-date-city_part-street-delivered-package-name-id [string]
-  ;string contains name and phone in this format
-  ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
+  ;from every txt field, and for every txt info I want to clean it from unnecessary signs
+  ;so I will use this solution, that wil remove all unnecessary signs with string replace
+  ;this will be used for extracting information from new order form in right format so it can be written in database
   (let [map {:full_name (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))
              :do_date   (clojure.string/replace (get (clojure.string/split string #"&") 1) "do_date=" "")
              :city_part (clojure.string/replace (get (clojure.string/split string #"&") 2) "city_part=" "")
@@ -50,8 +52,6 @@
              :id        (clojure.string/replace (get (clojure.string/split string #"&") 6) "id=" "")}] map))
 
 (defn full_name-date-city_part-street-delivered-package-name-phone-id [string]
-  ;string contains name and phone in this format
-  ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
   (let [map {:full_name (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))
              :do_date   (clojure.string/replace (get (clojure.string/split string #"&") 1) "do_date=" "")
              :city_part (clojure.string/replace (get (clojure.string/split string #"&") 2) "city_part=" "")
@@ -62,23 +62,24 @@
              :id        (clojure.string/replace (get (clojure.string/split string #"&") 7) "id=" "")}] map))
 
 (defn just-full-name [string]
-  ;string contains name and phone in this format
-  ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
   (let [map {:full_name (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))}] map))
 
 
 (defn administrator [string]
+  ;this will be used for formatting and preparing information extracted from administrator login form
   (let [map {:login    (clojure.string/replace (get (clojure.string/split string #"&") 0) "login=" "")
              :password (clojure.string/replace (get (clojure.string/split string #"&") 1) "password=" "")}] map))
 
 
 (defn register-user [string]
+  ;this will be used for formatting and preparing information extracted from user register form
   (let [map {:owner_name    (clojure.string/replace (get (clojure.string/split string #"&") 0) "owner_name=" "")
              :owner_surname (clojure.string/replace (get (clojure.string/split string #"&") 1) "owner_surname=" "")
              :phone (clojure.string/replace (get (clojure.string/split string #"&") 2) "phone=" "")
              :password (clojure.string/replace (get (clojure.string/split string #"&") 3) "password=" "")}] map))
 
 (defn login-user [string]
+  ;this will be used for formatting and preparing information extracted from user login form
   (let [map {
              :phone (clojure.string/replace (get (clojure.string/split string #"&") 0) "phone=" "")
              :password (clojure.string/replace (get (clojure.string/split string #"&") 1) "password=" "")}] map))
@@ -86,8 +87,7 @@
 
 
 (defn food-do-date-month-type-amount-id [string]
-  ;string contains name and phone in this format
-  ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
+  ;this will be used for formatting and preparing information extracted from new food order form
   (let [map {:do_date   (clojure.string/replace (get (clojure.string/split string #"&") 0) "do_date=" "")
              :month_name (clojure.string/replace (get (clojure.string/split string #"&") 1) "month_name=" "")
              :type_name    (street (clojure.string/replace (get (clojure.string/split string #"&") 2) "type_name=" ""))
@@ -95,22 +95,17 @@
              :id        (clojure.string/replace (get (clojure.string/split string #"&") 4) "id=" "")}] map))
 
 (defn delete-food-do-date-month-type-id [string]
-  ;string contains name and phone in this format
-  ;name=Nevena+Arsic&phone=0000&__anti-forgery-token=Unbound%3A+%23%27ring.middleware.anti-forgery%2F*anti-forgery-token*
+  ;this will be used for formatting and preparing information extracted from  food order delete form
   (let [map {:do_date   (clojure.string/replace (get (clojure.string/split string #"&") 0) "do_date=" "")
              :month_name (clojure.string/replace (get (clojure.string/split string #"&") 1) "month_name=" "")
              :type_id    (street (clojure.string/replace (get (clojure.string/split string #"&") 2) "type_id=" ""))
              :id        (clojure.string/replace (get (clojure.string/split string #"&") 3) "id=" "")}] map))
 
-;;RUTE
-;;dodala bih background image, zato sam probala view i background css ali ne ide
-;;jedino bih mozda morala da pravim bukvalne html stranice kao posebne viewe pa da ih zovem, a to mi deluje kao puno posla
 
 
-
-
-
-
+;;WORKING WITH ROUTES
+;;I wanted to add background image so I have tried making view i background css but I couldn't manage
+;;One possible solution is to make full html view pages for every page I need, but it seems like lot of work
 
 
 (defroutes app-routes
@@ -134,7 +129,7 @@
                  (assoc-in [:session :admin] false)))
 
 
-           ;;ZA REGISTRACIJU I LOGIN USERA
+           ;;FOR USER REGISTRATION AN LOGIN
            (GET "/user/register/" [] (p/user-register))
            (POST "/user/register/:id" req (do (let [user (register-user (slurp (:body req)))]
                                                 (odb/create-user user))
@@ -151,7 +146,7 @@
                (if (= (try (odb/check-credentials user) (catch Exception e (p/user-login "Neispravno korisnicko ime ili loznka"))) user)
                  (-> (resp/redirect "/user/home")
                      (assoc-in [:session :user] true))     ;u http zahtev dodaje se polje :session{:admin true}
-                 (p/user-login "Neispravno korisnicko ime ili loznka"))))
+                 (p/user-login "Neispravno korisnicko ime ili lozinka"))))
 
            (GET "/user/logout" []
              (-> (resp/redirect "/")
@@ -217,6 +212,7 @@
            )
 
 
+;; These routes will only be accessible for admin, when he is logged in
 (defroutes administrator-routes
 
            (GET "/admin/home" [] (p/base-page-admin))
@@ -284,6 +280,7 @@
 
            )
 
+; These routes will only be accessible for admin, when he is logged in
 (defroutes user-routes
 
            (GET "/user/home" [] (p/base-page-user))
@@ -293,9 +290,10 @@
                                            (resp/redirect "/user/home")))
            )
 
-;handler je funkcija koja prima zahtev i vraca odgovor
-;ako imamo admina u sesiji, koji se prijavio moze, nastavlja dalje rad
-;ako ne uloguje admin vraca se na login stranicu ponovo, tu treba da dodam poruku koja ce da mu ispise da nije dobro uneo kredencijale
+;Handler is function that takes request and return response
+;I will check if the admin is in session, and he will be in session if he is logged in
+;If he is in session then he can continue his work
+;If he is not in session, he will be redirected on admin/login page
 (defn wrap-admin-only [handler]
   (fn [req]
     (if (-> req :session :admin)
@@ -307,8 +305,8 @@
       (handler req)
       (resp/redirect "/user/login"))))
 
-;wrapovala sam posebne male delove aplikacije, od kojih svaki deo aplikacije radi nesto posebno
-;a onda sam ih samo uvezala u jedan zajednicki wrapping i ulancala u zajednicku aplikaciju
+;Wrapper is used to wrap around two different parts of applications, one for admin and one for user
+;and then to chain those two smaller pieces of app together whit wrapping into one bigger, full application
 
 (def wrapping
   (-> (routes (wrap-routes administrator-routes wrap-admin-only)
@@ -319,7 +317,7 @@
       ))
 
 (def server
-  (ring/run-jetty wrapping {:port 3032 :join? false}))
+  (ring/run-jetty wrapping {:port 3034 :join? false}))
 
 
 
@@ -361,15 +359,17 @@
 ;                session/wrap-session))
 
 
-;;pokrecem aplikaciju sa lein run i na portu 3020 ce mi se pojaviti aplikacija
+;;Application starts with the comand lein run from command prompt
 
 ;;main sam dodala da bi mi se pokrenula aplikacija
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World! Your application is started on port 3032 :)"))
-;aplikaciju pokrecem iz cmd a pomocu komande lein run
+  (println "Hello, World! Your application is started on port 3034 :)"))
+
 
 
 ;(if (= {:phone "0600323058" :password "123"} {:phone "0600323058" :password "123"})
 ;  "Equal )
+
+;(odb/check-credentials {:phone "060-0323-058" :password "zeljana"})

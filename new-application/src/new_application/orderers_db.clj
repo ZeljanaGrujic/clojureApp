@@ -47,6 +47,8 @@
 
 ;;WORKING WITH USERS
 (p/print-table (sql/query sql-db ["SELECT * FROM users"]))
+;;bez obzira da li se neko registrovao kao vec postojeci korinsik nema veze jer svakako ja nalazim prvog koji zadovoljava uslov
+;polazimo od pretpostavke da osobe imaju jedinstveni broj telefona, tako da ako neko i ima istu sifru nije vazno, nece imati isti br telefona
 
 
 ;;vrsicu proveru preko password i phone
@@ -54,12 +56,17 @@
   (sql/execute! sql-db ["INSERT INTO users (owner_name, owner_surname, phone, password) VALUES (?, ?, ?, ?) " (:owner_name user) (:owner_surname user) (:phone user) (:password user)]))
 ;(create-user {:owner_name "Biljana" :owner_surname "Grujic" :phone "0600133611" :password "2Fr4AA"})
 ;(create-user {:owner_name "Radmilo" :owner_surname "Stojanovic" :phone "063-332-813" :password "radmilo"})
-;(create-user {:owner_name "Ljiljana" :owner_surname "Grujic" :phone "060-0000-001" :password "ljilja"})
+;(create-user {:owner_name "Mileva" :owner_surname "Stojanovic" :phone "060-0000-002" :password "mileva"})
+
+(defn count-users []
+  (:num (nth (sql/query sql-db ["SELECT COUNT(*) as num FROM users"]) 0)))
+;(count-users)
 
 (defn check-credentials [user]
   (nth (sql/query sql-db ["SELECT phone, password FROM users WHERE phone=? AND password=?" (:phone user) (:password user)]) 0))
 ;;(if (= null (check-credentials {:phone "060-0323-058" :password "zeljan111a" }))
 ;  "Greska") ;ako ne nadje vraca () praznu listu, ako nadje vraca celog usera
+;(check-credentials {:phone "060-0000-000" :password "test" })
 
 ;(defn check-credentials1 [user]
 ;  (sql/query sql-db ["SELECT phone, password FROM users WHERE phone=? AND password=?" (:phone user) (:password user)]))
