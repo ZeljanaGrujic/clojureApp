@@ -39,8 +39,8 @@
 
 (defn get-id-by-type-name [type_name]
   (:id (nth (sql/query sql-db ["SELECT id FROM food_types WHERE type_name=?"  type_name]) 0)))
-(get-id-by-type-name "Pantelic zito")
-(get-id-by-type-name "Pantelic vitamini")
+;(get-id-by-type-name "Pantelic zito")
+;(get-id-by-type-name "Pantelic vitamini")
 
 
 (defn new-food-order [{id :id amount :amount do_date :do_date month_name :month_name type_name :type_name}]
@@ -52,7 +52,7 @@
 
 (defn get-next-food-id []
   (+ 1 (:m (nth (sql/query sql-db ["SELECT MAX(id) as m FROM food_orders"]) 0))))
-(get-next-food-id)
+;(get-next-food-id)
 
 ;;VIDETI KAKO CU URADITI OVE JOINOVE
 (defn list-full-forders [month_name]
@@ -76,7 +76,7 @@
 ;get-food-order-by-id
 (defn get-food-order-by-id [id]
   (nth (filter #(= (:id %) id) (sql/query sql-db ["SELECT * FROM food_orders"])) 0))
-(get-food-order-by-id 1)
+;(get-food-order-by-id 1)
 
 (defn delete-food-order [forder]
   (sql/execute! sql-db ["DELETE FROM food_orders WHERE id = ?"(:id forder)]))

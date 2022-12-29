@@ -31,7 +31,7 @@
 
 (defn check-credentials [user]
   (sql/query sql-db ["SELECT * FROM users WHERE phone=? AND password=?" (:phone user) (:password user)]))
-(check-credentials {:phone "0600133611" :password "2Fr4AA" }) ;ako ne nadje vraca () praznu listu, ako nadje vraca celog usera
+;(check-credentials {:phone "0600133611" :password "2Fr4AA" }) ;ako ne nadje vraca () praznu listu, ako nadje vraca celog usera
 
 (defn get-next-user-id []
   (+ 1 (:m (nth (sql/query sql-db ["SELECT MAX(id) as m FROM users"]) 0))))
@@ -39,4 +39,4 @@
 
 (defn get-user-id-by-phone [phone]
   (:id (nth (sql/query sql-db ["SELECT id FROM users WHERE phone=?" phone]) 0)))
-(get-user-id-by-phone "0600133611")
+;(get-user-id-by-phone "0600133611")

@@ -12,11 +12,16 @@
                  [ring/ring-anti-forgery "1.3.0"]
                  [ring/ring-defaults "0.3.4"]
                  [ring/ring-devel "1.8.0"]
-                 [org.xerial/sqlite-jdbc "3.7.2"]]
+                 [org.xerial/sqlite-jdbc "3.7.2"]
+                 ;[midje "1.10.9"]
+                 ;[criterium "0.4.6"]
+                 ]
   :main ^:skip-aot new-application.core
   :target-path "target/%s"
-  :plugins [[lein-ring "0.12.5"]]
+  :plugins [[lein-ring "0.12.5"]]                           ;[lein-midje "3.2.1"]
   :ring {:handler new-application.core/app-handler}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]}})
+
+;;Testing database functions get-id etc...

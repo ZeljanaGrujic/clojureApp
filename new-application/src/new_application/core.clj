@@ -21,7 +21,14 @@
     [new-application.orderers-db :as odb]
     [new-application.food-orders-db :as fodb]
     ; [new-application.users-db :as udb]
+    ;;[selmer.parser :as parser]
+    ;;[selmer.filters :as filters]
+    ;; [markdown.core :refer [md-to-html-string]]
+    ; [ring.util.http-response :refer [content-type ok]]
+    ;[ring.util.anti-forgery :refer [anti-forgery-field]]
+    ;[ring.middleware.anti-forgery :refer [*anti-forgery-token*]]
     ))
+(declare ^:dynamic *app-context*)
 
 ;;Resenje jer baca gresku kad cita polja
 (defn full-name [full_name]
@@ -98,85 +105,11 @@
 ;;RUTE
 ;;dodala bih background image, zato sam probala view i background css ali ne ide
 ;;jedino bih mozda morala da pravim bukvalne html stranice kao posebne viewe pa da ih zovem, a to mi deluje kao puno posla
-(defn base-page [& body]
-  ;basic template for all our pages
-  (html5 [:head [:title "KOKODA - GRUJIC"]]
-         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
-                 :crossorigin "anonymous"}]
-         [:link {:rel         "stylesheet"
-                 :type "txt/css"
-                 :href "background.css"
-                 }]
-
-         [:body
-          [:div {:class "bg"}
-          [:div.container
-           [:h1 "KOKODA - GRUJIC"]
-           [:h2 "Dnevnik klijenata i prodaje jaja"]
-           [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
-            [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
-            [:div.navbar-nav.ml-auto
-             [:a.nav-item.nav.link {:href "/admin/login"} "Admin-prijava"]
-             [:a.nav-item.nav.link {:href "/admin/logout"} "Admin-odjava"]
-             [:a.nav-item.nav.link {:href "/user/register/"} "Registruj se"]
-             [:a.nav-item.nav.link {:href "/user/login"} "Prijava"]
-             [:a.nav-item.nav.link {:href "/user/logout"} "Odjava"]
-             ]] [:hr]
-           body]]]))
-
-(defn base-page-admin [& body]
-  ;basic template for all our pages
-  (html5 [:head [:title "KOKODA - GRUJIC"]]
-         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
-                 :crossorigin "anonymous"}]
-         [:link {:rel         "stylesheet"
-                 :type "txt/css"
-                 :href "background.css"
-                 }]
-
-         [:body
-          [:div {:class "bg"}
-           [:div.container
-            [:h1 "KOKODA - GRUJIC"]
-            [:h2 "Dnevnik klijenata i prodaje jaja"]
-            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
-             [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
-             [:div.navbar-nav.ml-auto
-              [:a.nav-item.nav.link {:href "/admin/login"} "Admin-prijava"]
-              [:a.nav-item.nav.link {:href "/admin/logout"} "Admin-odjava"]
-              ]] [:hr]
-            [:a {:href "/page-orders"} [:h3 "Porucivanje jaja"]]
-            [:a {:href "/food-orders"} [:h3 "Porucivanje hrane"]]
-            body]]]))
 
 
-(defn base-page-user [& body]
-  ;basic template for all our pages
-  (html5 [:head [:title "KOKODA - GRUJIC"]]
-         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
-                 :crossorigin "anonymous"}]
-         [:link {:rel         "stylesheet"
-                 :type "txt/css"
-                 :href "background.css"
-                 }]
 
-         [:body
-          [:div {:class "bg"}
-           [:div.container
-            [:h1 "KOKODA - GRUJIC"]
-            [:h2 "Dnevnik klijenata i prodaje jaja"]
-            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
-             [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
-             [:div.navbar-nav.ml-auto
-              [:a.nav-item.nav.link {:href "/user/register/"} "Registruj se"]
-              [:a.nav-item.nav.link {:href "/user/login"} "Prijava"]
-              [:a.nav-item.nav.link {:href "/user/logout"} "Odjava"]
-              ]] [:hr]
-            [:a {:href "/orders/new/"} [:h3 "Porucivanje jaja"]]
-            body]]]))
+
+
 
 
 
@@ -225,7 +158,7 @@
                  (assoc-in [:session :user] false)))
 
 
-           (GET "/" [] (base-page))
+           (GET "/" [] (p/base-page))
 
 
            (GET "/grujicagro-info" [] (html5 [:p "Napisati neki malo uvod i istoriju firme, ovde bi trebalo dodati malo neke slike"]))
@@ -286,7 +219,7 @@
 
 (defroutes administrator-routes
 
-           (GET "/admin/home" [] (base-page-admin))
+           (GET "/admin/home" [] (p/base-page-admin))
            (GET "/page-orders" [] (p/base-orders-page))
            (GET "/all-orders" [] (p/index (odb/list-orders)))
            (GET "/orders/:order-id" [order-id] (p/view-order (odb/get-order-by-id1 (read-string order-id))))
@@ -353,7 +286,7 @@
 
 (defroutes user-routes
 
-           (GET "/user/home" [] (base-page-user))
+           (GET "/user/home" [] (p/base-page-user))
            (GET "/orders/new/" [] (p/form-new-order))
            (POST "/orders/new/:id" req (do (let [order (full_name-date-city_part-street-delivered-package-name-phone-id (slurp (:body req)))]
                                              (odb/new-order order))
@@ -374,16 +307,33 @@
       (handler req)
       (resp/redirect "/user/login"))))
 
+;wrapovala sam posebne male delove aplikacije, od kojih svaki deo aplikacije radi nesto posebno
+;a onda sam ih samo uvezala u jedan zajednicki wrapping i ulancala u zajednicku aplikaciju
+
 (def wrapping
   (-> (routes (wrap-routes administrator-routes wrap-admin-only)
               (wrap-routes user-routes wrap-user-only)
               app-routes)
       wrap-multipart-params
-      session/wrap-session))
+      session/wrap-session
+      ))
 
 (def server
-  (ring/run-jetty wrapping {:port 3030 :join? false}))
+  (ring/run-jetty wrapping {:port 3032 :join? false}))
 
+
+
+;(defn render
+;  "renders the HTML template located relative to resources/templates"
+;  [template & [params]]
+;  (content-type
+;    (ok
+;      (parser/render-file
+;        template
+;        (assoc params
+;          :page template
+;          :csrf-token *anti-forgery-token*
+;          :servlet-context *app-context*)))
 
 
 ;(defn full_name-amount-date-id [string]
@@ -417,9 +367,9 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World! Your application is started on port 3029 :)"))
+  (println "Hello, World! Your application is started on port 3032 :)"))
 ;aplikaciju pokrecem iz cmd a pomocu komande lein run
 
 
 ;(if (= {:phone "0600323058" :password "123"} {:phone "0600323058" :password "123"})
-;  "Equal")
+;  "Equal )

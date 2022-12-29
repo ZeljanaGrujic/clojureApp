@@ -10,6 +10,90 @@
     [new-application.users-db :as udb]))
 
 
+(defn base-page [& body]
+  ;basic template for all our pages
+  (html5 [:head [:title "KOKODA - GRUJIC"]]
+         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+                 :crossorigin "anonymous"}]
+         [:link {:rel         "stylesheet"
+                 :type "txt/css"
+                 :href "background.css"
+                 }]
+
+         [:body
+          [:div {:class "bg"}
+           [:div.container
+            [:h1 "KOKODA - GRUJIC"]
+            [:h2 "Dnevnik klijenata i prodaje jaja"]
+            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
+             [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
+             [:div.navbar-nav.ml-auto
+              [:a.nav-item.nav.link {:href "/admin/login"} "Admin-prijava"]
+              [:a.nav-item.nav.link {:href "/admin/logout"} "Admin-odjava"]
+              [:a.nav-item.nav.link {:href "/user/register/"} "Registruj se"]
+              [:a.nav-item.nav.link {:href "/user/login"} "Prijava"]
+              [:a.nav-item.nav.link {:href "/user/logout"} "Odjava"]
+              ]] [:hr]
+            body]]]))
+
+
+(defn base-page-admin [& body]
+  ;basic template for all our pages
+  (html5 [:head [:title "KOKODA - GRUJIC"]]
+         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+                 :crossorigin "anonymous"}]
+         [:link {:rel         "stylesheet"
+                 :type "txt/css"
+                 :href "background.css"
+                 }]
+
+         [:body
+          [:div {:class "bg"}
+           [:div.container
+            [:h1 "KOKODA - GRUJIC"]
+            [:h2 "Dnevnik klijenata i prodaje jaja"]
+            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
+             [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
+             [:div.navbar-nav.ml-auto
+              [:a.nav-item.nav.link {:href "/admin/login"} "Admin-prijava"]
+              [:a.nav-item.nav.link {:href "/admin/logout"} "Admin-odjava"]
+              ]] [:hr]
+            [:a {:href "/page-orders"} [:h3 "Porucivanje jaja"]]
+            [:a {:href "/food-orders"} [:h3 "Porucivanje hrane"]]
+            body]]]))
+
+
+(defn base-page-user [& body]
+  ;basic template for all our pages
+  (html5 [:head [:title "KOKODA - GRUJIC"]]
+         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+                 :crossorigin "anonymous"}]
+         [:link {:rel         "stylesheet"
+                 :type "txt/css"
+                 :href "background.css"
+                 }]
+
+         [:body
+          [:div {:class "bg"}
+           [:div.container
+            [:h1 "KOKODA - GRUJIC"]
+            [:h2 "Dnevnik klijenata i prodaje jaja"]
+            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
+             [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
+             [:div.navbar-nav.ml-auto
+              [:a.nav-item.nav.link {:href "/user/register/"} "Registruj se"]
+              [:a.nav-item.nav.link {:href "/user/login"} "Prijava"]
+              [:a.nav-item.nav.link {:href "/user/logout"} "Odjava"]
+              ]] [:hr]
+            [:a {:href "/orders/new/"} [:h3 "Porucivanje jaja"]]
+            body]]]))
+
+
+
+
 
 (defn base-orders-page [& body]
   (html5 [:head [:title "KOKODA - GRUJIC"]]
@@ -208,7 +292,7 @@
 
 (defn num-order-per-person [{full_name :full_name maked_orders :maked_orders total_amount :total_amount total_price :total_price}]
   (html5
-    [:li (format " Narucilac: %s            Broj naruzbina: %s       Ukupna kolicina: %s          Ukupna cena: %s " full_name maked_orders total_amount total_price)]))
+    [:li (format " Narucilac: %s            Broj naruzbina: %s       Ukupna kolicina: %s          Ukupna cena: %s dinara" full_name maked_orders total_amount total_price)]))
 
 (num-order-per-person {:full_name "NECA", :maked_orders 9 :total_amount 300 :price 1650})
 
@@ -275,8 +359,8 @@
   (base
     [:h3 "Statistika porucivanja hrane za koke:"]
     [:h4 (format "Ukupan broj ostavrenih narudzbina: %s" (:total_num_orders (nth (fodb/general-food-statistic) 0)))]
-    [:h4 (format "Ukupan ostvareni trosak: %s" (:general_price (nth (fodb/general-food-statistic) 0)))]
-    [:h4 (format "Ukupna porucena kolicina: %s" (:general_amount (nth (fodb/general-food-statistic) 0)))]
+    [:h4 (format "Ukupan ostvareni trosak : %s evra" (:general_price (nth (fodb/general-food-statistic) 0)))]
+    [:h4 (format "Ukupna porucena kolicina: %s kilograma" (:general_amount (nth (fodb/general-food-statistic) 0)))]
     [:hr]
     [:h4 "Statistika narudzbina po mesecu:"]
     (all-statistic-for-months (fodb/orders-per-month))))
