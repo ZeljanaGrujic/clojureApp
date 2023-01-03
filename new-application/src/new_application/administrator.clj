@@ -11,3 +11,8 @@
 (check-credentials {:login "admin" :password "admin" })
 
 ;wrepovacemo nas app hendler with session midleware
+
+;clojure for the brave and truth, thread local binding
+; (bind user pera... i onda ce u okviru tog lokalnog bindinga user biti pera, taj bajdning je vezan za taj scope
+;menaging clojure session with ring, potraziti na netu
+;Eric Normand pogledati ima resursa, pogledati ring cookie ring midleware i td...

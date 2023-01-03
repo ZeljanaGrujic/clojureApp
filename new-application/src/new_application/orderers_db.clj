@@ -79,7 +79,7 @@
 
 (defn get-user-id-by-phone [phone]
   (:id (nth (sql/query sql-db ["SELECT id FROM users WHERE phone=?" phone]) 0)))
-;(get-user-id-by-phone "0600133611")
+;(get-user-id-by-phone "060-0000-000")
 
 
 
@@ -112,7 +112,7 @@
 
 (defn get-id-by-type-order [type_order]
   (:id (nth (sql/query sql-db ["SELECT id FROM orders_types WHERE package_name=?"type_order]) 0)))
-(get-id-by-type-order "10komada")
+;(get-id-by-type-order "10komada")
 
 (p/print-table (sql/query sql-db ["SELECT * FROM orderers"]))
 
@@ -126,7 +126,7 @@
   (sql/execute! sql-db ["INSERT INTO orderers (full_name, do_date, city_part, street, delivered, amount_id, user_id) VALUES (?, ?, ?, ?, ?, ?,?) "  full_name do_date city_part street delivered (get-id-by-type-order package_name) (get-user-id-by-phone phone)]))
 
 ;(create-order "NECA" "27.12.2022." "HIM" "Udarnih brigada 3" "NE" "300 komada")
-;(new-order {:full_name "Zeljana" :do_date "27.12.2022." :city_part "HRS" :street "Ustanicka 5" :delivered "NE" :package_name "10komada" :phone "063-1933-320"})
+;(new-order {:full_name "Test order" :do_date "4.1.2023." :city_part "HRS" :street "Ustanicka 5" :delivered "NE" :package_name "10komada" :phone "060-0000-000"})
 
 (defn edit-order [order]
   (sql/execute! sql-db ["UPDATE orderers  SET full_name = ? WHERE id = ?"  (:full_name order) (:id order)])
@@ -136,7 +136,7 @@
   (sql/execute! sql-db ["UPDATE orderers  SET delivered = ? WHERE id = ?"  (:delivered order) (:id order)])
   (sql/execute! sql-db ["UPDATE orderers  SET amount_id = ? WHERE id = ?"  (get-id-by-type-order (:package_name order)) (:id order)]))
 
-;(edit-order {:id 2 :full_name "JESA" :do_date "27.12.2022." :city_part "Centar" :street "Ustanicka 5" :delivered "NE" :package_name "270 komada"})
+;(edit-order {:id 22 :full_name "Test order edit" :do_date "5.1.2023." :city_part "HRS" :street "Ustanicka 5" :delivered "NE" :package_name "10komada"})
 
 (defn list-orders [] (sql/query sql-db ["SELECT * FROM orderers"]))
 
@@ -162,10 +162,11 @@
 (defn list-delivered-orders [] (sql/query sql-db ["SELECT * FROM orderers WHERE delivered='DA'"]))
 (list-delivered-orders)
 
+
 (defn get-order-by-id [id]
   (nth (filter #(= (:id %) id) (sql/query sql-db ["SELECT orderers.id, full_name, do_date, city_part, street, delivered, amount, price
    FROM orderers JOIN orders_types ON orderers.amount_id = orders_types.id"])) 0))
-(get-order-by-id 3)
+;(get-order-by-id 3)
 
 (defn get-order-by-id1 [id]
   (nth (filter #(= (:id %) id) (sql/query sql-db ["SELECT orderers.id as id, full_name, do_date, city_part, street, delivered, amount, price, phone
@@ -179,7 +180,7 @@
 
 (defn get-order-by-name [full_name]
   (sql/query sql-db ["SELECT * FROM orderers WHERE full_name= ?" full_name]))
-;(get-order-by-name "NECA")
+;(get-order-by-name "Test order edit")
 
 (defn get-next-id []
   (+ 1 (:m (nth (sql/query sql-db ["SELECT MAX(id) as m FROM orderers"]) 0))))
@@ -187,7 +188,7 @@
 
 (defn delete-order [order]
   (sql/execute! sql-db ["DELETE FROM orderers WHERE id = ?"(:id order)]))
-;(delete-order {:id 3, :full_name "NECA", :amount "200", :do_date "23.12.2022", :location "HIM" :delivered "NE"})
+;(delete-order {:id 23, :full_name "Test order edit", :amount "10", :do_date "5.1.2023.", :location "HRS" :delivered "NE"})
 
 ;;;;;RAD SA STATISTIKOM NARUCIVANJA JAJA
 
@@ -204,7 +205,6 @@
 
 (defn total-num-orders []
   (:total_num (nth (sql/query sql-db ["SELECT COUNT(*) as total_num FROM orderers"]) 0)))
-(total-num-orders)
 
 (defn total-num-delivered-orders []
   (:total_num (nth (sql/query sql-db ["SELECT COUNT(*) as total_num FROM orderers WHERE delivered='DA'"]) 0)))

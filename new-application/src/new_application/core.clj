@@ -145,7 +145,8 @@
              (let [user (login-user (slurp (:body req)))]
                (if (= (try (odb/check-credentials user) (catch Exception e (p/user-login "Neispravno korisnicko ime ili loznka"))) user)
                  (-> (resp/redirect "/user/home")
-                     (assoc-in [:session :user] true))     ;u http zahtev dodaje se polje :session{:admin true}
+                     (assoc-in [:session :user] true))     ;u http zahtev dodaje se polje :session{:admin true}   {:id user} probaj da dodas to umesto true
+                 ;namestiti da se umesto true uzima id iz usera
                  (p/user-login "Neispravno korisnicko ime ili lozinka"))))
 
            (GET "/user/logout" []
@@ -302,6 +303,7 @@
 (defn wrap-user-only [handler]
   (fn [req]
     (if (-> req :session :user)
+      ;proveriti ovde :id da li je digit u sesiji i da li je bas taj id od tog usera tako da moze da ostane u sesiji i da pored njega jos neko bude u sesiji preko drugog id ja
       (handler req)
       (resp/redirect "/user/login"))))
 

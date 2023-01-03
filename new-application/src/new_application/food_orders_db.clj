@@ -74,9 +74,11 @@
 (list-full-forders-delete)
 
 ;get-food-order-by-id
+(p/print-table (sql/query sql-db ["SELECT * FROM food_orders"]))
+
 (defn get-food-order-by-id [id]
   (nth (filter #(= (:id %) id) (sql/query sql-db ["SELECT * FROM food_orders"])) 0))
-;(get-food-order-by-id 1)
+(get-food-order-by-id 1)
 
 (defn delete-food-order [forder]
   (sql/execute! sql-db ["DELETE FROM food_orders WHERE id = ?"(:id forder)]))
