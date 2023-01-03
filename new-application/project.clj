@@ -15,7 +15,7 @@
                  [org.xerial/sqlite-jdbc "3.7.2"]
                  ;[midje "1.10.9"]
                  ;[criterium "0.4.6"]
-                 ]
+                 [selmer "1.12.55"]]
   :main ^:skip-aot new-application.core
   :target-path "target/%s"
   :plugins [[lein-ring "0.12.5"]]                           ;[lein-midje "3.2.1"]
