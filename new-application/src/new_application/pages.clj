@@ -105,7 +105,7 @@
           [:div.container
            [:h2 "Dnevnik klijenata i prodaje jaja"]
            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
-            [:a.navbar-brand {:href "/"} "      Pocetna stranica      "]
+            [:a.navbar-brand {:href "/admin/home"} "      Pocetna stranica      "]
             [:a.nav-item.nav.link {:href "/admin/logout"} "        Odjava        "]
             ;[:div.navbar-nav.ml-auto
             ; [:a.nav-item.nav.link {:href "/all-orders"} "Porudzbine"]]
@@ -137,7 +137,7 @@
           [:div.container
            [:h2 "Dnevnik porucivanja hrane za koke"]
            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
-            [:a.navbar-brand {:href "/"} "      Pocetna stranica      "]
+            [:a.navbar-brand {:href "/admin/home"} "      Pocetna stranica      "]
             [:a.nav-item.nav.link {:href "/admin/logout"} "        Odjava        "]
             ;[:div.navbar-nav.ml-auto
             ; [:a.nav-item.nav.link {:href "/all-orders"} "Porudzbine"]]
@@ -170,7 +170,7 @@
       [:h1 "KOKODA - GRUJIC"]
       [:h2 "Dnevnik klijenata i prodaje jaja"]
       [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
-       [:a.navbar-brand {:href "/"} "Pocetna stranica"]
+       [:a.navbar-brand {:href "/admin/home"} "Pocetna stranica"]
        ;mozda dodati i da mi se izlista za dostavu hrane, kad i koliko, i za mesec
        ;ali pamtiti foru za svakog meseca tonu i fiksirati cenu tone i onda samo za taj isti mesec po nekoliko puta dodavati narudzbine pa onda prebrojati sve to
        [:div.navbar-nav.ml-right
@@ -380,8 +380,9 @@
 ;(one-order-view (db/get-order-by-id 2))
 
 
-(defn form-new-order []
+(defn form-new-order [& [msg]]
   (html5
+    (when msg [:div.alert.alert-danger msg])
     [:body
      (form/form-to [:post (str "/orders/new/" (odb/get-next-id))]
 

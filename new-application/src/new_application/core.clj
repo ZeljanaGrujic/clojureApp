@@ -102,45 +102,6 @@
              :id        (clojure.string/replace (get (clojure.string/split string #"&") 3) "id=" "")}] map))
 
 
-
-
-(defn info-page-view []
-  [:html {:lang "eng"}
-   [:head
-    [:meta {:charset "UTF-8"}]
-    [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
-    [:link {:rel "stylesheet" :href "./background.css"}]
-    [:title "O nama"]]
-   [:body
-    [:div.container
-     [:h1 "KOKODA - GRUJIC"]
-     [:h2 "Porodicna, poljoprivredna firma"]
-     [:br]
-     [:br]
-     [:br]
-     [:p.info-paragraph "KOKODA - GRUJIC je osnovana 2018. godine.
-        Prva ideja se pojavila kod mame i tate blizanaca, Zeljane i Zeljka Grujica.
-        Roditelji Biljana i Sreko Grujic su odlucili, da pored glavnog, trgovinskog posla, zapocnu jos jedan posao, uzimajuci u obzir da su im se deca upisala na fakultete u Beogradu.
-        Posao su zapoceli kupovinom 100 koka nosilja i 1000kg hrane, ni ne sluteci da ce se posao razviti i da ce se broj koka jako brzo uvecati.
-        Sada njihov porodicni posao broji 600 koka nosilja, i preko dvadeset lokalnih musterija."]
-     [:br]
-     [:br]
-     [:br]
-     [:br]
-     [:br]
-     [:br]
-     [:footer.footer_class
-      [:p "Kontakt informacije:"]
-      [:hr]
-      [:p "Telefon- Srecko Grujic 064-5642-425"]
-      [:p "Email: kokodagrujic@gmail.com"]
-      [:p "Ulica i broj: Dr. Cambe 10, Smederevska Palanka"]]
-     [:div.image
-      [:img {:src "./images/bg.jpg" :alt "Egs background image"}]]
-     [:p "Vlasnik: Biljana i Srecko Grujic"]
-     [:p "Autor: Zeljana Grujic"]]]])
-
-
 ;;WORKING WITH ROUTES
 ;;I wanted to add background image so I have tried making view i background css but I couldn't manage
 ;;One possible solution is to make full html view pages for every page I need, but it seems like lot of work
@@ -324,9 +285,16 @@
 
            (GET "/user/home" [] (p/base-page-user))
            (GET "/orders/new/" [] (p/form-new-order))
+           (GET "/order/failed/" [] (p/base-page-user "NEUSPESNO! Broj telefona mora biti indentican broju koriscenom za registraciju/login"))
+           (GET "/order/succes/" [] (p/base-page-user "USPESNO ste kreirali svoju naruzbinu!"))
            (POST "/orders/new/:id" req (do (let [order (full_name-date-city_part-street-delivered-package-name-phone-id (slurp (:body req)))]
-                                             (odb/new-order order))
-                                           (resp/redirect "/user/home")))
+                                             (let [succes (try (odb/new-order order)
+                                                               (catch Exception e (resp/redirect "/order/failed/")))]
+                                               (if (= succes (seq '(1)))
+                                                 (resp/redirect "/order/succes/")
+                                                 (resp/redirect "/order/failed/"))))
+                                           ;(resp/redirect "/user/home")
+                                           ))
            )
 
 ;Handler is function that takes request and return response
