@@ -64,9 +64,13 @@
 
 (defn check-credentials [user]
   (nth (sql/query sql-db ["SELECT phone, password FROM users WHERE phone=? AND password=?" (:phone user) (:password user)]) 0))
-;;(if (= null (check-credentials {:phone "060-0323-058" :password "zeljan111a" }))
+;(if (= null (check-credentials {:phone "060-0323-058" :password "zeljan111a" })))
 ;  "Greska") ;ako ne nadje vraca () praznu listu, ako nadje vraca celog usera
-;(check-credentials {:phone "060-0000-000" :password "test" })
+;(check-credentials {:phone "060-0000-999" :password "test" })
+
+(defn if-exist [user]
+  (sql/query sql-db ["SELECT * FROM users WHERE phone=?" (:phone user)]))
+;(if-exist {:owner_name "Biljana" :owner_surname "Grujic" :phone "060013361111" :password "2Fr4AA"})
 
 ;(defn check-credentials1 [user]
 ;  (sql/query sql-db ["SELECT phone, password FROM users WHERE phone=? AND password=?" (:phone user) (:password user)]))
@@ -226,5 +230,18 @@
    FROM orderers JOIN orders_types ON orderers.amount_id = orders_types.id GROUP BY LOWER(full_name) ORDER BY total_amount DESC"]))
 (orders-per-person)
 
+(defn get-id-by-phone [ph]
+  (:id (nth (sql/query sql-db ["SELECT id FROM users where phone=?" ph]) 0)))
+;(get-id-by-phone "060-0000-000")
 
+(defn get-name-by-id-session [id]
+  (:owner_name (nth (sql/query sql-db ["SELECT owner_name FROM users where id=?" id]) 0)))
+
+(defn get-surname-by-id-session [id]
+  (:owner_surname (nth (sql/query sql-db ["SELECT owner_surname FROM users where id=?" id]) 0)))
+(get-surname-by-id-session 22)
+
+(defn get-phone-by-id-session [id]
+  (:phone (nth (sql/query sql-db ["SELECT phone FROM users where id=?" id]) 0)))
+(get-phone-by-id-session 22)
 

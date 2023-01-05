@@ -1,8 +1,14 @@
 (ns new-application.administrator)
 ;napisacu check login password proveru
 
-(def administrator-login (or (System/getenv "ADMIN_LOGIN") "admin"))
-(def administrator-pass (or (System/getenv "ADMIN_PASSWORD") "admin"))
+;(def administrator-login (or (System/getenv "ADMIN_LOGIN") "admin"))
+;(def administrator-pass (or (System/getenv "ADMIN_PASSWORD") "admin"))
+
+
+(def ^:dynamic administrator-login "admin")
+(def ^:dynamic administrator-pass "admin")
+(binding [administrator-login "admin"
+          administrator-pass "admin"])
 
 ;check user intput
 (defn check-credentials [{ login :login password :password}]

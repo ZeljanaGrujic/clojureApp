@@ -119,7 +119,7 @@
              (let [administrator (administrator (slurp (:body req)))]
                (if (a/check-credentials administrator)
                  (-> (resp/redirect "/admin/home")
-                     (assoc-in [:session :admin] true))     ;u http zahtev dodaje se polje :session{:admin true}
+                     (assoc-in [:session :admin] true))     ; :session{:admin true}
                  (p/administrator-login "Neispravno korisnicko ime ili loznka"))))
 
 
@@ -130,12 +130,19 @@
 
            ;;FOR USER REGISTRATION AN LOGIN
            (GET "/user/register/" [] (p/user-register))
+           (GET "/failed/registration" [] (p/base-page "NEUSPESNA registracija! Vec postoji nalog sa ovim brojem teleofna, ako ste to Vi odaberite opciju *prijavi se*"))
            (POST "/user/register/:id" req (do (let [user (register-user (slurp (:body req)))]
-                                                (odb/create-user user))
-                                              (resp/redirect "/user/login")))
+                                                (let [succes (odb/if-exist user)]
+                                                  (if (= (empty? succes) true)
+                                                    (do
+                                                      (odb/create-user user)
+                                                      (resp/redirect "/user/login"))
+                                                    (resp/redirect "/failed/registration"))))
+                                              ;(resp/redirect "/user/login")
+                                              ))
            (GET "/user/login" [:as {session :session}]
              ; if admin is already logged in then go to index page
-             (if (:user session)
+             (if (= (:role session) "user")
                (resp/redirect "/user/home")
                (p/user-login)))
 
@@ -144,13 +151,14 @@
              (let [user (login-user (slurp (:body req)))]
                (if (= (try (odb/check-credentials user) (catch Exception e (p/user-login "Neispravno korisnicko ime ili loznka"))) user)
                  (-> (resp/redirect "/user/home")
-                     (assoc-in [:session :user] true))     ;u http zahtev dodaje se polje :session{:admin true}   {:id user} probaj da dodas to umesto true
+                     (assoc-in [:session :role] "user")
+                     (assoc-in [:session :id] (odb/get-id-by-phone (:phone user))))     ;u http zahtev dodaje se polje :session{:role client}   :session{:id some number} probaj da dodas to umesto true
                  ;namestiti da se umesto true uzima id iz usera
                  (p/user-login "Neispravno korisnicko ime ili lozinka"))))
 
            (GET "/user/logout" []
              (-> (resp/redirect "/")
-                 (assoc-in [:session :user] false)))
+                 (assoc-in [:session :role] false)))
 
 
            (GET "/" [] (p/base-page))
@@ -283,7 +291,7 @@
 ; These routes will only be accessible for admin, when he is logged in
 (defroutes user-routes
 
-           (GET "/user/home" [] (p/base-page-user))
+           (GET "/user/home" [:as {session :session}] (p/base-page-user session))
            (GET "/orders/new/" [] (p/form-new-order))
            (GET "/order/failed/" [] (p/base-page-user "NEUSPESNO! Broj telefona mora biti indentican broju koriscenom za registraciju/login"))
            (GET "/order/succes/" [] (p/base-page-user "USPESNO ste kreirali svoju naruzbinu!"))
@@ -295,6 +303,7 @@
                                                  (resp/redirect "/order/failed/"))))
                                            ;(resp/redirect "/user/home")
                                            ))
+           (GET "/user/account/" [:as {session :session}] (p/view-user-account session))
            )
 
 ;Handler is function that takes request and return response
@@ -303,12 +312,15 @@
 ;If he is not in session, he will be redirected on admin/login page
 (defn wrap-admin-only [handler]
   (fn [req]
+    (println handler)
+    (println req)
     (if (-> req :session :admin)
       (handler req)
       (resp/redirect "/admin/login"))))
+
 (defn wrap-user-only [handler]
   (fn [req]
-    (if (-> req :session :user)
+    (if (-> req :session :role)
       ;proveriti ovde :id da li je digit u sesiji i da li je bas taj id od tog usera tako da moze da ostane u sesiji i da pored njega jos neko bude u sesiji preko drugog id ja
       (handler req)
       (resp/redirect "/user/login"))))
@@ -325,7 +337,7 @@
       ))
 
 (def server
-  (ring/run-jetty wrapping {:port 3035 :join? false}))
+  (ring/run-jetty wrapping {:port 3041 :join? false}))
 
 
 
@@ -373,7 +385,7 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World! Your application is started on port 3035 :)"))
+  (println "Hello, World! Your application is started on port 3041 :)"))
 
 
 

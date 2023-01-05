@@ -1,3 +1,6 @@
+;OVO JE PISANO ZA SQLYog za koji mora da se pokrene MySql server
+;;NECU RADITI SA OVIM FAJLOM, PREBACILA SAM SE NA SQLite
+
 (ns new-application.db)
 (require '[clojure.java.jdbc :as sql])
 

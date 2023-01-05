@@ -278,3 +278,40 @@
   (testing "forders-general-stat"
     (let [succes (fodb/orders-per-month)]
       (is (or (= (empty? succes) true) (= (empty? succes) false))))))
+
+(deftest test-if-exist
+  "It will check if user with that phone already exist, because phone number is unique for each person.
+  If user doesn't exist, it will return empty collection (), but if he exists result won't be empty"
+  (testing "exist"
+    (let [succes (odb/if-exist {:owner_name "Biljana" :owner_surname "Grujic" :phone "0600133611" :password "2Fr4AA"})]
+      (is (or (= (empty? succes) true) (= (empty? succes) false))))))
+
+;(if (string? (get-name-by-id-session 22)) "OK")
+
+(deftest test-name-session
+  "When user is logged in his id is stored in session, so when we search his name by his id some string should be returned"
+  (testing "name form session"
+    (let [succes (odb/get-name-by-id-session 1)]
+      (is (string? succes)))))
+
+(deftest test-surname-session
+  "When user is logged in his id is stored in session, so when we search his surname by his id some string should be returned"
+  (testing "surname form session"
+    (let [succes (odb/get-surname-by-id-session 1)]
+      (is (string? succes)))))
+
+(deftest test-phone-session
+  "When user is logged in his id is stored in session, so when we search his phone by his id some string should be returned"
+  (testing "phone form session"
+    (let [succes (odb/get-phone-by-id-session 1)]
+      (is (string? succes)))))
+
+(deftest test-find-id-by-phone
+  "When we search id trought phone some integer should be returned,
+  you can see phone numbers that we have in database and type it here,
+  we used credentials from test user"
+  (testing "find id by phone"
+    (let [succes (odb/get-id-by-phone "060-0000-000")]
+      (is (integer? succes))
+      (is (> succes 0))
+      (is (= succes 8)))))

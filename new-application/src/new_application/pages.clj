@@ -13,13 +13,14 @@
 (defn base-page [& body]
   ;basic template for all our pages
   (html5 [:head [:title "KOKODA - GRUJIC"]]
-         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
-                 :crossorigin "anonymous"}]
+         [:link
+          {:rel "stylesheet"
+           :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+           :integrity "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+           :crossorigin "anonymous"}]
          [:link {:rel         "stylesheet"
                  :type "txt/css"
-                 :href "background.css"
-                 }]
+                 :href "background.css"}]
 
          [:body
           [:div {:class "bg"}
@@ -41,9 +42,11 @@
 (defn base-page-admin [& body]
   ;basic template for all our pages
   (html5 [:head [:title "KOKODA - GRUJIC"]]
-         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
-                 :crossorigin "anonymous"}]
+         [:link
+          {:rel "stylesheet"
+           :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+           :integrity "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+           :crossorigin "anonymous"}]
          [:link {:rel         "stylesheet"
                  :type "txt/css"
                  :href "background.css"
@@ -65,12 +68,14 @@
             body]]]))
 
 
-(defn base-page-user [& body]
+(defn base-page-user [session]
   ;basic template for all our pages
   (html5 [:head [:title "KOKODA - GRUJIC"]]
-         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
-                 :crossorigin "anonymous"}]
+         [:link
+          {:rel "stylesheet"
+           :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+           :integrity "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+           :crossorigin "anonymous"}]
          [:link {:rel         "stylesheet"
                  :type "txt/css"
                  :href "background.css"
@@ -80,7 +85,6 @@
           [:div {:class "bg"}
            [:div.container
             [:h1 "KOKODA - GRUJIC"]
-            [:h2 "Dnevnik klijenata i prodaje jaja"]
             [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
              [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
              [:div.navbar-nav.ml-auto
@@ -89,8 +93,8 @@
               [:a.nav-item.nav.link {:href "/user/logout"} "Odjava"]
               ]] [:hr]
             [:a {:href "/orders/new/"} [:h3 "Porucivanje jaja"]]
-            body]]]))
-
+            [:a {:href "/user/account/"} [:h3 "Moj nalog"]]
+            ]]]))
 
 
 
@@ -203,6 +207,19 @@
 
 ;(defn index [body]
 ;  (base body))
+
+
+(defn view-user-account [session]
+  (html5
+    [:div.container
+     [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
+      [:a.navbar-brand {:href "/user/home"} "      Pocetna stranica      "]
+      [:a.nav-item.nav.link {:href "/user/logout"} "        Odjava        "]]
+     [:hr]
+     [:small (:id session) " Jedinstveni broj korisnika"]
+    [:h2 "Ime: " (odb/get-name-by-id-session (:id session))]
+    [:h2 "Prezime:  " (odb/get-surname-by-id-session (:id session))]
+    [:h2 "Telefon: " (odb/get-phone-by-id-session (:id session))]]))
 
 
 (defn index [orders]
