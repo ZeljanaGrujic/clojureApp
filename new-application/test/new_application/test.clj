@@ -315,3 +315,30 @@
       (is (integer? succes))
       (is (> succes 0))
       (is (= succes 8)))))
+
+(deftest test-users-orders-session
+  "It will check if user in session has maked some orders, it can return empty collection or result won't be empty
+  We can pick any user_id from users table"
+  (testing "session-orders"
+    (let [succes (odb/user-orders-session 5)]
+      (is (or (= (empty? succes) true) (= (empty? succes) false))))))
+
+
+(deftest test-create-user-note
+  "If creation of user note is successful it will return (1) in sequence,
+   this is only for testing and this test note won't be used in application"
+  (testing "create new user note"
+    (let [succes (odb/create-note {:message_body "Test note" :user_id -1})]
+      (is (= succes (seq '(1)))))))
+
+(deftest test-unread-notes
+  "It will return all unread notes that we have,  result can be empty collection"
+  (testing "list-unread-notes"
+    (let [succes (odb/list-unread-notes)]
+      (is (or (= (empty? succes) true) (= (empty? succes) false))))))
+
+(deftest test-read-notes
+  "It will return all read notes that we have,  result can be empty collection"
+  (testing "list-read-notes"
+    (let [succes (odb/list-read-notes)]
+      (is (or (= (empty? succes) true) (= (empty? succes) false))))))

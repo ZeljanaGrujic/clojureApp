@@ -45,6 +45,14 @@
 ;                     password varchar(255) );"
 ;                    )
 
+;(sql/db-do-commands sql-db
+;                    "CREATE TABLE notes (
+;                    id integer primary key autoincrement,
+;                     message_body varchar(255),
+;                     user_id int,
+;                     read varchar(255) default 'NE' );"
+;                    )
+
 ;;WORKING WITH USERS
 (p/print-table (sql/query sql-db ["SELECT * FROM users"]))
 ;;bez obzira da li se neko registrovao kao vec postojeci korinsik nema veze jer svakako ja nalazim prvog koji zadovoljava uslov
@@ -218,6 +226,10 @@
   (:total_num (nth (sql/query sql-db ["SELECT COUNT(*) as total_num FROM orderers WHERE delivered='NE'"]) 0)))
 (total-num-undelivered-orders)
 
+(defn total-income []
+  (:total_income (nth (sql/query sql-db ["SELECT SUM(price) as total_income FROM orderers JOIN orders_types ON orderers.amount_id = orders_types.id "]) 0)))
+
+(total-income)
 
 (defn full_order_info [id]
   (sql/query sql-db ["SELECT orderers.id, full_name, do_date, city_part, street, delivered, amount, price
@@ -245,3 +257,33 @@
   (:phone (nth (sql/query sql-db ["SELECT phone FROM users where id=?" id]) 0)))
 (get-phone-by-id-session 22)
 
+(defn user-orders-session [id]
+  (sql/query sql-db ["SELECT full_name,do_date,street, amount_id, user_id, package_name, price
+   FROM orderers JOIN orders_types ON orderers.amount_id = orders_types.id WHERE user_id=?" id]))
+(user-orders-session 5)
+
+
+;;;;;WORKING WITH USER NOTES
+
+(p/print-table (sql/query sql-db ["SELECT * FROM notes"]))
+
+(defn create-note [note]
+  (sql/execute! sql-db ["INSERT INTO notes (message_body, user_id) VALUES (?, ?)" (:message_body note) (:user_id note)]))
+;(create-note {:message_body "Ponistiti narudzbinu za 6.1.2023 od 10kom" :user_id 5})
+;create note vraca seq od 1
+
+(defn list-unread-notes [] (sql/query sql-db ["SELECT owner_name, owner_surname, phone, notes.id, message_body FROM notes JOIN users ON notes.user_id= users.id WHERE notes.read= 'NE'"]))
+(list-unread-notes)
+(defn list-read-notes [] (sql/query sql-db ["SELECT owner_name, owner_surname, phone, notes.id, message_body FROM notes JOIN users ON notes.user_id= users.id WHERE notes.read= 'DA'"]))
+(list-read-notes)
+
+(defn get-note-by-id [id]
+  (nth (filter #(= (:id %) id) (sql/query sql-db ["SELECT owner_name, owner_surname, phone, notes.id, message_body,read FROM notes JOIN users ON notes.user_id= users.id WHERE notes.id=?" id])) 0))
+(get-note-by-id 3)
+
+(defn get-user-id-by-id-session [id]
+  (:id (nth (sql/query sql-db ["SELECT id FROM users where id=?" id]) 0)))
+
+(defn edit-note [note]
+  (sql/execute! sql-db ["UPDATE notes  SET message_body=? WHERE id =?"  (:message_body note) (:id note)])
+  (sql/execute! sql-db ["UPDATE notes  SET read=? WHERE id =?"  (:read note) (:id note)]))

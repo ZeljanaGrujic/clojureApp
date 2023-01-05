@@ -38,28 +38,31 @@
   (clojure.string/replace full_name #"\+" " "))
 (defn street [street]
   (clojure.string/replace street #"\+" " "))
+(defn note [note]
+  ;name in format name+surname
+  (clojure.string/replace note #"\+" " "))
 
 (defn full_name-date-city_part-street-delivered-package-name-id [string]
   ;from every txt field, and for every txt info I want to clean it from unnecessary signs
   ;so I will use this solution, that wil remove all unnecessary signs with string replace
   ;this will be used for extracting information from new order form in right format so it can be written in database
-  (let [map {:full_name (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))
-             :do_date   (clojure.string/replace (get (clojure.string/split string #"&") 1) "do_date=" "")
-             :city_part (clojure.string/replace (get (clojure.string/split string #"&") 2) "city_part=" "")
-             :street    (street (clojure.string/replace (get (clojure.string/split string #"&") 3) "street=" ""))
-             :delivered (clojure.string/replace (get (clojure.string/split string #"&") 4) "delivered=" "")
-             :package_name    (clojure.string/replace (get (clojure.string/split string #"&") 5) "package_name=" "")
-             :id        (clojure.string/replace (get (clojure.string/split string #"&") 6) "id=" "")}] map))
+  (let [map {:full_name    (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))
+             :do_date      (clojure.string/replace (get (clojure.string/split string #"&") 1) "do_date=" "")
+             :city_part    (clojure.string/replace (get (clojure.string/split string #"&") 2) "city_part=" "")
+             :street       (street (clojure.string/replace (get (clojure.string/split string #"&") 3) "street=" ""))
+             :delivered    (clojure.string/replace (get (clojure.string/split string #"&") 4) "delivered=" "")
+             :package_name (clojure.string/replace (get (clojure.string/split string #"&") 5) "package_name=" "")
+             :id           (clojure.string/replace (get (clojure.string/split string #"&") 6) "id=" "")}] map))
 
 (defn full_name-date-city_part-street-delivered-package-name-phone-id [string]
-  (let [map {:full_name (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))
-             :do_date   (clojure.string/replace (get (clojure.string/split string #"&") 1) "do_date=" "")
-             :city_part (clojure.string/replace (get (clojure.string/split string #"&") 2) "city_part=" "")
-             :street    (street (clojure.string/replace (get (clojure.string/split string #"&") 3) "street=" ""))
-             :delivered (clojure.string/replace (get (clojure.string/split string #"&") 4) "delivered=" "")
-             :package_name    (clojure.string/replace (get (clojure.string/split string #"&") 5) "package_name=" "")
-             :phone    (clojure.string/replace (get (clojure.string/split string #"&") 6) "phone=" "")
-             :id        (clojure.string/replace (get (clojure.string/split string #"&") 7) "id=" "")}] map))
+  (let [map {:full_name    (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))
+             :do_date      (clojure.string/replace (get (clojure.string/split string #"&") 1) "do_date=" "")
+             :city_part    (clojure.string/replace (get (clojure.string/split string #"&") 2) "city_part=" "")
+             :street       (street (clojure.string/replace (get (clojure.string/split string #"&") 3) "street=" ""))
+             :delivered    (clojure.string/replace (get (clojure.string/split string #"&") 4) "delivered=" "")
+             :package_name (clojure.string/replace (get (clojure.string/split string #"&") 5) "package_name=" "")
+             :phone        (clojure.string/replace (get (clojure.string/split string #"&") 6) "phone=" "")
+             :id           (clojure.string/replace (get (clojure.string/split string #"&") 7) "id=" "")}] map))
 
 (defn just-full-name [string]
   (let [map {:full_name (full-name (clojure.string/replace (get (clojure.string/split string #"&") 0) "full_name=" ""))}] map))
@@ -75,31 +78,43 @@
   ;this will be used for formatting and preparing information extracted from user register form
   (let [map {:owner_name    (clojure.string/replace (get (clojure.string/split string #"&") 0) "owner_name=" "")
              :owner_surname (clojure.string/replace (get (clojure.string/split string #"&") 1) "owner_surname=" "")
-             :phone (clojure.string/replace (get (clojure.string/split string #"&") 2) "phone=" "")
-             :password (clojure.string/replace (get (clojure.string/split string #"&") 3) "password=" "")}] map))
+             :phone         (clojure.string/replace (get (clojure.string/split string #"&") 2) "phone=" "")
+             :password      (clojure.string/replace (get (clojure.string/split string #"&") 3) "password=" "")}] map))
 
 (defn login-user [string]
   ;this will be used for formatting and preparing information extracted from user login form
   (let [map {
-             :phone (clojure.string/replace (get (clojure.string/split string #"&") 0) "phone=" "")
+             :phone    (clojure.string/replace (get (clojure.string/split string #"&") 0) "phone=" "")
              :password (clojure.string/replace (get (clojure.string/split string #"&") 1) "password=" "")}] map))
 
 
 
 (defn food-do-date-month-type-amount-id [string]
   ;this will be used for formatting and preparing information extracted from new food order form
-  (let [map {:do_date   (clojure.string/replace (get (clojure.string/split string #"&") 0) "do_date=" "")
+  (let [map {:do_date    (clojure.string/replace (get (clojure.string/split string #"&") 0) "do_date=" "")
              :month_name (clojure.string/replace (get (clojure.string/split string #"&") 1) "month_name=" "")
-             :type_name    (street (clojure.string/replace (get (clojure.string/split string #"&") 2) "type_name=" ""))
-             :amount    (clojure.string/replace (get (clojure.string/split string #"&") 3) "amount=" "")
-             :id        (clojure.string/replace (get (clojure.string/split string #"&") 4) "id=" "")}] map))
+             :type_name  (street (clojure.string/replace (get (clojure.string/split string #"&") 2) "type_name=" ""))
+             :amount     (clojure.string/replace (get (clojure.string/split string #"&") 3) "amount=" "")
+             :id         (clojure.string/replace (get (clojure.string/split string #"&") 4) "id=" "")}] map))
 
 (defn delete-food-do-date-month-type-id [string]
   ;this will be used for formatting and preparing information extracted from  food order delete form
-  (let [map {:do_date   (clojure.string/replace (get (clojure.string/split string #"&") 0) "do_date=" "")
+  (let [map {:do_date    (clojure.string/replace (get (clojure.string/split string #"&") 0) "do_date=" "")
              :month_name (clojure.string/replace (get (clojure.string/split string #"&") 1) "month_name=" "")
              :type_id    (street (clojure.string/replace (get (clojure.string/split string #"&") 2) "type_id=" ""))
-             :id        (clojure.string/replace (get (clojure.string/split string #"&") 3) "id=" "")}] map))
+             :id         (clojure.string/replace (get (clojure.string/split string #"&") 3) "id=" "")}] map))
+
+(defn user-note [string]
+  (let [map {:message_body (note (clojure.string/replace (get (clojure.string/split string #"&") 0) "message_body=" ""))
+             :user_id      (clojure.string/replace (get (clojure.string/split string #"&") 1) "user_id=" "")}] map))
+
+(defn user-note-edit [string]
+  (let [map {:owner_name    (clojure.string/replace (get (clojure.string/split string #"&") 0) "owner_name=" "")
+             :owner_surname (clojure.string/replace (get (clojure.string/split string #"&") 1) "owner_surname=" "")
+             :phone         (clojure.string/replace (get (clojure.string/split string #"&") 2) "phone=" "")
+             :message_body  (note (clojure.string/replace (get (clojure.string/split string #"&") 3) "message_body=" ""))
+             :read          (clojure.string/replace (get (clojure.string/split string #"&") 4) "read=" "")
+             :id            (clojure.string/replace (get (clojure.string/split string #"&") 5) "id=" "")}] map))
 
 
 ;;WORKING WITH ROUTES
@@ -152,7 +167,7 @@
                (if (= (try (odb/check-credentials user) (catch Exception e (p/user-login "Neispravno korisnicko ime ili loznka"))) user)
                  (-> (resp/redirect "/user/home")
                      (assoc-in [:session :role] "user")
-                     (assoc-in [:session :id] (odb/get-id-by-phone (:phone user))))     ;u http zahtev dodaje se polje :session{:role client}   :session{:id some number} probaj da dodas to umesto true
+                     (assoc-in [:session :id] (odb/get-id-by-phone (:phone user)))) ;u http zahtev dodaje se polje :session{:role client}   :session{:id some number} probaj da dodas to umesto true
                  ;namestiti da se umesto true uzima id iz usera
                  (p/user-login "Neispravno korisnicko ime ili lozinka"))))
 
@@ -260,21 +275,21 @@
            (GET "/food-orders" [] (p/base-food-page))
            (GET "/food-order/new/" [] (p/form-new-food))
            (POST "/food-order/new/:id" req (do (let [food (food-do-date-month-type-amount-id (slurp (:body req)))]
-                                             (fodb/new-food-order food))
-                                           (resp/redirect "/food-orders")))
+                                                 (fodb/new-food-order food))
+                                               (resp/redirect "/food-orders")))
            (GET "/all-food-orders" [] (p/index-for-monthly-orders))
            (GET "/month-order/:mo" [mo] (p/food-orders-view (fodb/list-full-forders mo)))
 
            (GET "/all-food-orders/delete" [] (p/index-for-food-delete (fodb/list-full-forders-delete)))
            (GET "/food-order/delete/:id" [id] (p/form-delete-food-order (fodb/get-food-order-by-id (read-string id))))
            (POST "/food-order/delete/:id" req (do (let [forder (delete-food-do-date-month-type-id (slurp (:body req)))]
-                                                (fodb/delete-food-order forder))
-                                              (resp/redirect "/food-orders")))
+                                                    (fodb/delete-food-order forder))
+                                                  (resp/redirect "/food-orders")))
            (GET "/foods-statistic" [] (p/base-food-statistic-page))
 
 
            (GET "/orders-search" [] (p/all-orderers (odb/list-orderers-names)))
-            (GET "/orderer/:name" [name] (p/orders-view (odb/list-orders-by-name name)))
+           (GET "/orderer/:name" [name] (p/orders-view (odb/list-orders-by-name name)))
            ;htela sam da mi se kuca u polju ime, pa da se otvara stranica ali nisam znala da uradim, pa sam uradila preko linkova
            ;(POST "/orders/search/:name" req (do (let [order (just-full-name (slurp (:body req)))]
            ;                                       (odb/list-orders-by-name order)))
@@ -284,14 +299,23 @@
            (GET "/food-orders/search" [] (p/all-food-types (fodb/list-type-names)))
            (GET "/food-type/:name" [name] (p/food-orders-view2 (fodb/list-full-forders-by-name name)))
 
+           ;;USER NOTES
+           (GET "/user-notes" [] (p/base-notes-page))
+           (GET "/unread/notes" [] (p/index-unread-notes (odb/list-unread-notes)))
+           (GET "/read/notes" [] (p/index-read-notes (odb/list-read-notes)))
+           (GET "/unread/note/:id" [id] (p/view-unread-note (odb/get-note-by-id (read-string id))))
+           (GET "/read/note/:id" [id] (p/view-read-note (odb/get-note-by-id (read-string id))))
 
-
+           (GET "/unread/note/edit/:id" [id] (p/edit-user-note (odb/get-note-by-id (read-string id))))
+           (POST "/unread/note/:id" req (do (let [note (user-note-edit (slurp (:body req)))]
+                                              (odb/edit-note note))
+                                            (resp/redirect "/user-notes")))
            )
 
 ; These routes will only be accessible for admin, when he is logged in
 (defroutes user-routes
 
-           (GET "/user/home" [:as {session :session}] (p/base-page-user session))
+           (GET "/user/home" [:as {session :session}] (p/base-page-user1 session))
            (GET "/orders/new/" [] (p/form-new-order))
            (GET "/order/failed/" [] (p/base-page-user "NEUSPESNO! Broj telefona mora biti indentican broju koriscenom za registraciju/login"))
            (GET "/order/succes/" [] (p/base-page-user "USPESNO ste kreirali svoju naruzbinu!"))
@@ -304,6 +328,19 @@
                                            ;(resp/redirect "/user/home")
                                            ))
            (GET "/user/account/" [:as {session :session}] (p/view-user-account session))
+           (GET "/user/account/orders" [:as {session :session}] (p/user-account-orders session))
+
+
+           (GET "/user/note" [:as {session :session}] (p/view-user-note session))
+           (GET "/note/failed" [:as {session :session}] (p/view-user-note session "Neuspesno slanje napomene, pokusajte ponovo"))
+           (GET "/note/success" [] (p/base-page-user "USPESNO ste poslali napomenu!"))
+           (POST "/user/note" req (do (let [note (user-note (slurp (:body req)))]
+                                        (let [succes (try (odb/create-note note)
+                                                          (catch Exception e (resp/redirect "/note/failed")))]
+                                          (if (= succes (seq '(1)))
+                                            (resp/redirect "/note/success")
+                                            (resp/redirect "/note/failed"))))))
+
            )
 
 ;Handler is function that takes request and return response
@@ -337,7 +374,7 @@
       ))
 
 (def server
-  (ring/run-jetty wrapping {:port 3041 :join? false}))
+  (ring/run-jetty wrapping {:port 3042 :join? false}))
 
 
 
@@ -385,7 +422,7 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World! Your application is started on port 3041 :)"))
+  (println "Hello, World! Your application is started on port 3042 :)"))
 
 
 

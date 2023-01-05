@@ -14,11 +14,11 @@
   ;basic template for all our pages
   (html5 [:head [:title "KOKODA - GRUJIC"]]
          [:link
-          {:rel "stylesheet"
-           :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-           :integrity "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+          {:rel         "stylesheet"
+           :href        "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+           :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
            :crossorigin "anonymous"}]
-         [:link {:rel         "stylesheet"
+         [:link {:rel  "stylesheet"
                  :type "txt/css"
                  :href "background.css"}]
 
@@ -43,11 +43,11 @@
   ;basic template for all our pages
   (html5 [:head [:title "KOKODA - GRUJIC"]]
          [:link
-          {:rel "stylesheet"
-           :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-           :integrity "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+          {:rel         "stylesheet"
+           :href        "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+           :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
            :crossorigin "anonymous"}]
-         [:link {:rel         "stylesheet"
+         [:link {:rel  "stylesheet"
                  :type "txt/css"
                  :href "background.css"
                  }]
@@ -65,18 +65,49 @@
               ]] [:hr]
             [:a {:href "/page-orders"} [:h3 "Porucivanje jaja"]]
             [:a {:href "/food-orders"} [:h3 "Porucivanje hrane"]]
+            [:a {:href "/user-notes"} [:h3 "Napomene korisnika"]]
             body]]]))
 
 
-(defn base-page-user [session]
+(defn base-page-user [& body]
+  ;basic template for all our pages
+  (html5 [:head [:title "KOKODA - GRUJIC"]]
+         [:link {:rel         "stylesheet" :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+                 :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+                 :crossorigin "anonymous"}]
+         [:link {:rel  "stylesheet"
+                 :type "txt/css"
+                 :href "background.css"
+                 }]
+         [:body
+          [:div {:class "bg"}
+           [:div.container
+            [:h1 "KOKODA - GRUJIC"]
+            [:h2 "Dnevnik klijenata i prodaje jaja"]
+            [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
+             [:a.navbar-brand {:href "/grujicagro-info"} "Informacije"]
+             [:div.navbar-nav.ml-auto
+              [:a.nav-item.nav.link {:href "/user/register/"} "Registruj se"]
+              [:a.nav-item.nav.link {:href "/user/login"} "Prijava"]
+              [:a.nav-item.nav.link {:href "/user/logout"} "Odjava"]
+              ]] [:hr]
+            [:a {:href "/orders/new/"} [:h3 "Porucivanje jaja"]]
+            [:a {:href "/user/account/"} [:h3 "Moj nalog"]]
+            [:a {:href "/user/account/orders"} [:h3 "Moje porudzbine"]]
+            [:a {:href "/user/note"} [:h3 "Posalji napomenu"]]
+            body]]]))
+
+
+
+(defn base-page-user1 [session]
   ;basic template for all our pages
   (html5 [:head [:title "KOKODA - GRUJIC"]]
          [:link
-          {:rel "stylesheet"
-           :href "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-           :integrity "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+          {:rel         "stylesheet"
+           :href        "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+           :integrity   "sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
            :crossorigin "anonymous"}]
-         [:link {:rel         "stylesheet"
+         [:link {:rel  "stylesheet"
                  :type "txt/css"
                  :href "background.css"
                  }]
@@ -94,7 +125,8 @@
               ]] [:hr]
             [:a {:href "/orders/new/"} [:h3 "Porucivanje jaja"]]
             [:a {:href "/user/account/"} [:h3 "Moj nalog"]]
-            ]]]))
+            [:a {:href "/user/account/orders"} [:h3 "Moje porudzbine"]]
+            [:a {:href "/user/note"} [:h3 "Posalji napomenu"]]]]]))
 
 
 
@@ -217,9 +249,9 @@
       [:a.nav-item.nav.link {:href "/user/logout"} "        Odjava        "]]
      [:hr]
      [:small (:id session) " Jedinstveni broj korisnika"]
-    [:h2 "Ime: " (odb/get-name-by-id-session (:id session))]
-    [:h2 "Prezime:  " (odb/get-surname-by-id-session (:id session))]
-    [:h2 "Telefon: " (odb/get-phone-by-id-session (:id session))]]))
+     [:h2 "Ime: " (odb/get-name-by-id-session (:id session))]
+     [:h2 "Prezime:  " (odb/get-surname-by-id-session (:id session))]
+     [:h2 "Telefon: " (odb/get-phone-by-id-session (:id session))]]))
 
 
 (defn index [orders]
@@ -274,7 +306,7 @@
     [:h2 "Narucilac: " (:full_name order) "           Porucena kolicina: " (:amount order) "          Cena:" (:price order)]
     [:h2 "Deo grada:  " (:city_part order) "            Ulica i broj: " (:street order)]
     [:h2 "Datum isporuke: " (:do_date order) "            Izvrsena isporuka:  " (:delivered order)]
-    [:h2 "Telefon narucioca: " (:phone order) ]))
+    [:h2 "Telefon narucioca: " (:phone order)]))
 
 (view-order {:id        2,
              :full_name "JESA",
@@ -318,6 +350,21 @@
           (map num-order-per-person porders)]))
 (odb/orders-per-person)
 (persons-orders (odb/orders-per-person))
+
+
+(defn order-view-session [{full_name :full_name do_date :do_date street :street amount_id :amount_id user_id :user_id package_name :package_name price :price}]
+  (html5
+    [:li (format " Ime na koje se vrsi isporuka: %s               Datum isporuke: %s                  Ulica: %s         Kolicina: %s                Cena: %s " full_name do_date street package_name price)]))
+
+(defn orders-view-session [orders]
+  (if (= orders ())
+    (html5 [:h2 "Jos uvek niste kreirali porudzbinu."])
+    (html5 [:ul (map order-view-session orders)])))
+
+(defn user-account-orders [session]
+  (orders-view-session (odb/user-orders-session (:id session))))
+
+
 
 
 
@@ -366,6 +413,7 @@
     [:h4 (format "Ukupan broj ostavrenih narudzbina: %s" (odb/total-num-orders))]
     [:h4 (format "Ukupan broj isporucenih narudzbina: %s" (odb/total-num-delivered-orders))]
     [:h4 (format "Ukupan broj neisporucenih narudzbina: %s" (odb/total-num-undelivered-orders))]
+    [:h4 (format "Ukupno ostvareni prihod: %s dinara" (odb/total-income))]
     [:hr]
     [:h4 "Broj narudzbina savkog korisnika:"]
     (persons-orders (odb/orders-per-person))))
@@ -423,12 +471,12 @@
                    [:div.form-group
                     (form/label "delivered" "Isporuceno (DA/NE) : ")
                     ;(form/text-field "delivered" "delivered")
-                    [:div.div-separator (form/drop-down {:class "form-class"} "delivered" [ "NE"])]]
+                    [:div.div-separator (form/drop-down {:class "form-class"} "delivered" ["NE"])]]
                    [:hr]
                    [:div.form-group
                     (form/label "package_name" "Kolicina (br.komada) : ")
                     [:div.div-separator (form/drop-down {:class "form-class"} "package_name" ["10komada" "20komada" "30komada" "40komada" "60komada" "70komada" "100komada" "120komada" "150komada" "180komada" "210komada" "240komada" "270komada" "300komada"])]]
-                    [:hr]
+                   [:hr]
                    [:div.form-group
                     (form/label "phone" "Telefon: ")
                     (form/text-field {:class "form-control"} "phone")]
@@ -605,12 +653,12 @@
   (base [:h1 "Vrste hrane"]
         (for [ft food-types]
           [:div
-           [:h4 [:a {:href (str "/food-type/"(:type_name ft))} " Vrsta hrane: " (:type_name ft)]]])))
+           [:h4 [:a {:href (str "/food-type/" (:type_name ft))} " Vrsta hrane: " (:type_name ft)]]])))
 (all-food-types (fodb/list-type-names))
 
 (defn food-order-view2 [{id :id amount :amount do_date :do_date month_name :month_name}]
   (html5
-    [:li (format " ID naruzbine: %s         Kolicina: %s           Datum isporuke: %s      " id amount do_date )]))
+    [:li (format " ID naruzbine: %s         Kolicina: %s           Datum isporuke: %s      " id amount do_date)]))
 
 (defn food-orders-view2 [forders]
   (html5 [:ul
@@ -664,3 +712,113 @@
        [:hr]
        (form/submit-button {:class "btn btn-primary"} "Uloguj se")
        )]))
+
+
+;;WORKING WITH USER NOTES
+
+(defn view-user-note [session & [msg]]
+  (html5
+    (when msg [:div.alert.alert-danger msg])
+    [:body
+     (form/form-to
+       [:post (str "/user/note")]
+
+       [:div.form-group
+        (form/label "message_body" "Unesite napomenu:  ")
+        (form/text-area {:class "form-control"} "message_body")]
+       [:hr]
+       (form/hidden-field "user_id" (odb/get-user-id-by-id-session (:id session)))
+       (anti-forgery-field)
+       [:hr]
+       (form/submit-button {:class "btn btn-primary"} "Posalji napomenu")
+       )]))
+
+(defn base-notes-page [& body]
+  (html5 [:head [:title "KOKODA - GRUJIC"]]
+         [:link {:rel         "stylesheet"
+                 :href        "https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+                 :integrity   "sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+                 :crossorigin "anonymous"}]
+         [:body
+          [:div.container
+           [:h2 "Dnevnik klijenata i prodaje jaja"]
+           [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
+            [:a.navbar-brand {:href "/admin/home"} "      Pocetna stranica      "]
+            [:a.nav-item.nav.link {:href "/admin/logout"} "        Odjava        "]
+            ;[:div.navbar-nav.ml-auto
+            ; [:a.nav-item.nav.link {:href "/all-orders"} "Porudzbine"]]
+            ;[:div.navbar-nav.ml-auto
+            ; [:a.nav-item.nav.link {:href "/orders/new/"} "Kreiraj novu" "\t"]]
+            ;[:div.navbar-nav.ml-auto
+            ; [:a.nav-item.nav.link {:href "/all-orders/update"} "Izmeni"]]
+            ;[:div.navbar-nav.ml-auto
+            ; [:a.nav-item.nav.link {:href "/all-orders/delete"} "Obrisi"]]]
+            ] [:hr]
+           [:a {:href "/unread/notes"} [:h3 "Neprocitane napomene"]]
+           [:a {:href "/read/notes"} [:h3 "Procitane napomene"]]
+           body]]))
+
+(defn index-unread-notes [notes]
+  (if (= () notes)
+    (html5 [:h2 "Nema neprocitanih napomena"])
+    (html5 [:h1 "Neprocitane napomene"]
+           (for [n notes]
+             [:div
+              [:h4 [:a {:href (str "/unread/note/" (:id n))} "Broj napomene: " (:id n)]]]))))
+
+(defn index-read-notes [notes]
+  (if (= () notes)
+    (html5 [:h2 "Nema procitanih napomena"])
+    (html5 [:h1 "Procitane napomene"]
+           (for [n notes]
+             [:div
+              [:h4 [:a {:href (str "/read/note/" (:id n))} "Broj napomene: " (:id n)]]]))))
+
+(defn view-unread-note [note]
+  (base
+    [:a {:href (str "/unread/note/edit/" (:id note))} "Direktno izmeni napomenu"]
+    [:hr]
+    [:small (:id note) " Redni br. napomene"]
+    [:h2 "Napisao: " (:owner_name note) (:owner_surname note)]
+    [:h2 "Telefon narucioca: " (:phone note)]
+    [:h2 "Napomena: " (:message_body note)]))
+
+(defn view-read-note [note]
+  (base
+    [:small (:id note) " Redni br. napomene"]
+    [:h2 "Napisao: " (:owner_name note) (:owner_surname note)]
+    [:h2 "Telefon narucioca: " (:phone note)]
+    [:h2 "Napomena: " (:message_body note)]))
+
+(defn edit-user-note [note]
+  (html5
+    [:body
+     (form/form-to [:post (if note
+                            (str "/unread/note/" (:id note))
+                            "/unread/notes")]
+
+                   [:div.form-group
+                    (form/label "owner_name" "Napomenu napisao- ime:  ")
+                    (form/text-field {:class "form-control"} "owner_name" (:owner_name note))]
+                   [:hr]
+                   [:div.form-group
+                    (form/label "owner_surname" "Napomenu napisao- prezime:  ")
+                    (form/text-field {:class "form-control"} "owner_surname" (:owner_surname note))]
+                   [:hr]
+                   [:div.form-group
+                    (form/label "phone" "Telefon:  ")
+                    (form/text-field {:class "form-control"} "phone" (:phone note))]
+                   [:hr]
+                   [:div.form-group
+                    (form/label "message_body" "Napomena:  ")
+                    (form/text-area {:class "form-control"} "message_body" (:message_body note))]
+                   [:hr]
+                   [:hr]
+                   [:div.form-group
+                    (form/label "read" "Procitano (DA/NE): ")
+                    ;(form/text-field "deliverede" (:delivered order))
+                    (form/drop-down {:class "form-class"} "read" ["DA" "NE"])]
+                   (form/hidden-field "id" (:id note))
+                   (anti-forgery-field)
+                   (form/submit-button {:class "btn btn-primary"} "Izmeni napomenu")
+                   )]))
