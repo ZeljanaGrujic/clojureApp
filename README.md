@@ -26,7 +26,8 @@ A built-in testing library was used for testing, and all its features are reques
 prvo post metoda, onda kako sam htela da se interaktivno unosi ime kupca i tako da izlaze njegove porudzbine, kako dodati posebnu sesiju za usera, bacanje exceptiona kod registrovanja i logovanja, kako staviti datume, kako staviti validacije da su stvarno uneti datumi, za check box kako sam zakucala 1000kg i za pakete koji se uzimaju iz padajuce liste a u bazi je fiksiran broj jer nisam znala kako da kastujem txt broj sa forme u number itd itd, problem za ukljucivanje midjea, problem za vs code, da nisam znala kako da sredim navbar i da napravim vise razmaka, da nisam znala kako da postavim pozadinu, da sam koristila selmer jer nije htelo da mi renderuje stranicu, i idalje nece sa pozadinom, pomenuti da sam uvidela da sam mogla bolje da napravim arhitekturu aplikacije a to sam videla tek kad sam pogledala onu knjigu..
 
 # What next?
-koji sve propusti bi trebalo da budu reseni, a to su ovi gore pomenuti...
+koji sve propusti bi trebalo da budu reseni, a to su ovi gore pomenuti, kako dalje nastaviti ucenje clojure a i optimizovati aplikaciju tako da ima raznorazne promene i nove mogucnosti, ovo je mali deo napravljen za potrebe predmeta Alati i metode, ali odnekud treba poceti...
+Pleading : Please be kind, this is my first real project, and specially it is written in Clojure which I also use for the first time.
 
 ## Prerequisites and Usage 
 
