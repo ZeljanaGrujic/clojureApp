@@ -27,11 +27,13 @@ prvo post metoda, onda kako sam htela da se interaktivno unosi ime kupca i tako 
 
 # What next?
 koji sve propusti bi trebalo da budu reseni, a to su ovi gore pomenuti, kako dalje nastaviti ucenje clojure a i optimizovati aplikaciju tako da ima raznorazne promene i nove mogucnosti, ovo je mali deo napravljen za potrebe predmeta Alati i metode, ali odnekud treba poceti...
-Pleading : Please be kind, this is my first real project, and specially it is written in Clojure which I also use for the first time.
+Pleading : Please be kind, this is my first real project, and specially it is written in Clojure which I also use for the first time. I would very much like to upgrade this application even more, but I will take a little break (temporarily) from working on this first version of the application, due to obligations for another subject.
 
 ## Prerequisites and Usage 
 
 You should have Leiningen installed. To start the application you need to open terminal in the application folder, and type the command lein run. The application will start on the predefined port, but in case that address is already in bind, you should open the project, find src folder, core.clj file inside src folder, and server function within that file, there you will see predefined port number. Feel free to change it, and everything will work fine.
+
+# References
 
 ## License
 
