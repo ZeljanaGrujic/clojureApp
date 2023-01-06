@@ -53,6 +53,16 @@ Pleading : Please keep in mind that this is my first real project, and specially
 You should have Leiningen installed. To start the application you need to open terminal in the application folder, and type the command lein run. The application will start on the predefined port, but in case that address is already in bind, you should open the project, find src folder, core.clj file inside src folder, and server function within that file, there you will see predefined port number. Feel free to change it, and everything will work fine.
 
 # References
+I built this app from scratch with some help of the following materials:
+1.Clojure For the Brave and True, Daniel Higginbotham
+2. Web Development with Clojure, Dmitri Sotnikov 
+3. https://github.com/kyleecodes/ToDoApp-Clojure
+4. https://github.com/CatalinStefan/clojure-blog
+5. https://www.youtube.com/watch?v=Tq2t9uTTJj0&t=3s
+6. https://www.youtube.com/watch?v=jOX0uK3jsbI&t=2s
+7. Documentation for used Clojure libraries
+8. Stack overflow :D
+
 
 ## License
 
